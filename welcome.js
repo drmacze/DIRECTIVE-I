@@ -146,10 +146,24 @@
     const nextLoginCount = storage.getNumber('directive_account_logins') + 1;
     storage.setNumber('directive_account_logins', nextLoginCount);
     storage.set('directive_local_session', String(Date.now()));
+
+    const safeProfile = {
+      gamertag: account.gamertag || '',
+      xuid: account.xuid || '',
+      displayName: account.displayName || account.gamertag || '',
+      gamerpic: account.gamerpic || '',
+      gamerscore: account.gamerscore || '',
+      provider: account.provider || 'Microsoft/Xbox',
+      authenticated: true,
+      updatedAt: Date.now()
+    };
+
     try {
-      sessionStorage.setItem('directive_minecraft_gamertag', account.gamertag || '');
-      sessionStorage.setItem('directive_minecraft_xuid', account.xuid || '');
+      localStorage.setItem('directive_minecraft_profile', JSON.stringify(safeProfile));
+      sessionStorage.setItem('directive_minecraft_gamertag', safeProfile.gamertag);
+      sessionStorage.setItem('directive_minecraft_xuid', safeProfile.xuid);
     } catch (_) {}
+
     renderStats();
     setTimeout(() => {
       closeLoginSheet();
