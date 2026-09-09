@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#070909" />
   <meta name="description" content="DIRECTIVE I — a cinematic Minecraft zombie apocalypse modpack." />
   <title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
+  <script src="entry-gate.js?v=1"></script>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="hero-effects.css?v=2" />
   <style>
@@ -161,93 +162,34 @@
 
       <div class="page-shell">
         <button class="trailer-card" type="button" data-open-trailer aria-label="Play DIRECTIVE I teaser">
-          <video
-            class="trailer-preview"
-            muted
-            playsinline
-            webkit-playsinline
-            preload="metadata"
-            poster="assets/directive-i-trailer-poster.jpg?v=5"
-            aria-hidden="true"
-            data-trailer-preview>
+          <video class="trailer-preview" muted playsinline webkit-playsinline preload="metadata" poster="assets/directive-i-trailer-poster.jpg?v=5" aria-hidden="true" data-trailer-preview>
             <source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" />
             <source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" />
           </video>
           <span class="trailer-shade" aria-hidden="true"></span>
-          <span class="trailer-ui">
-            <span class="trailer-play"><i class="play-triangle"></i></span>
-            <span class="trailer-label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span>
-            <span class="trailer-time">00:10</span>
-          </span>
+          <span class="trailer-ui"><span class="trailer-play"><i class="play-triangle"></i></span><span class="trailer-label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span><span class="trailer-time">00:10</span></span>
         </button>
       </div>
     </section>
 
     <section class="section systems-section" id="systems">
       <div class="page-shell">
-        <div class="section-heading systems-heading">
-          <p class="kicker">03 / CORE SYSTEMS</p>
-          <h2>Designed for consequence.</h2>
-          <p>Every system supports the same goal: make each encounter feel readable, deliberate, and dangerous.</p>
-        </div>
-
+        <div class="section-heading systems-heading"><p class="kicker">03 / CORE SYSTEMS</p><h2>Designed for consequence.</h2><p>Every system supports the same goal: make each encounter feel readable, deliberate, and dangerous.</p></div>
         <div class="systems-grid">
-          <article class="system-card">
-            <span class="system-index">01</span>
-            <div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define how each firearm performs.</p></div>
-          </article>
-          <article class="system-card">
-            <span class="system-index">02</span>
-            <div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of purely cosmetic.</p></div>
-          </article>
-          <article class="system-card">
-            <span class="system-index">03</span>
-            <div><h3>Infected pressure</h3><p>Encounters are staged around threat, visibility, sound, and limited breathing room.</p></div>
-          </article>
-          <article class="system-card">
-            <span class="system-index">04</span>
-            <div><h3>Dark-world atmosphere</h3><p>Minimal UI, controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div>
-          </article>
+          <article class="system-card"><span class="system-index">01</span><div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define how each firearm performs.</p></div></article>
+          <article class="system-card"><span class="system-index">02</span><div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of purely cosmetic.</p></div></article>
+          <article class="system-card"><span class="system-index">03</span><div><h3>Infected pressure</h3><p>Encounters are staged around threat, visibility, sound, and limited breathing room.</p></div></article>
+          <article class="system-card"><span class="system-index">04</span><div><h3>Dark-world atmosphere</h3><p>Minimal UI, controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div></article>
         </div>
       </div>
     </section>
 
-    <section class="section intel-section" id="intel">
-      <div class="page-shell intel-card">
-        <div>
-          <p class="kicker">04 / FIELD INTEL</p>
-          <h2>Season I is only the beginning.</h2>
-        </div>
-        <div class="intel-copy">
-          <p>New trailer segments can be added to this site one by one as the campaign grows. The media section is already structured for a longer final trailer.</p>
-          <button class="text-link" type="button" data-open-trailer>Replay transmission <span>↗</span></button>
-        </div>
-      </div>
-    </section>
+    <section class="section intel-section" id="intel"><div class="page-shell intel-card"><div><p class="kicker">04 / FIELD INTEL</p><h2>Season I is only the beginning.</h2></div><div class="intel-copy"><p>New trailer segments can be added to this site one by one as the campaign grows. The media section is already structured for a longer final trailer.</p><button class="text-link" type="button" data-open-trailer>Replay transmission <span>↗</span></button></div></div></section>
   </main>
 
-  <footer class="site-footer">
-    <div class="page-shell footer-grid">
-      <a class="brand footer-brand" href="#top" aria-label="DIRECTIVE I home">
-        <span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span>
-      </a>
-      <p>Minecraft Zombie Apocalypse Modpack · Season I</p>
-      <p class="footer-note">Unofficial fan-made Minecraft project. Not affiliated with Mojang or Microsoft.</p>
-    </div>
-  </footer>
+  <footer class="site-footer"><div class="page-shell footer-grid"><a class="brand footer-brand" href="#top" aria-label="DIRECTIVE I home"><span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span></a><p>Minecraft Zombie Apocalypse Modpack · Season I</p><p class="footer-note">Unofficial fan-made Minecraft project. Not affiliated with Mojang or Microsoft.</p></div></footer>
 
-  <dialog class="trailer-modal" data-trailer-modal aria-labelledby="modal-title">
-    <div class="modal-frame">
-      <div class="modal-topbar">
-        <div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div>
-        <button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button>
-      </div>
-      <video controls playsinline webkit-playsinline preload="auto" data-modal-video>
-        <source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" />
-        <source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" />
-      </video>
-    </div>
-  </dialog>
+  <dialog class="trailer-modal" data-trailer-modal aria-labelledby="modal-title"><div class="modal-frame"><div class="modal-topbar"><div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div><button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button></div><video controls playsinline webkit-playsinline preload="auto" data-modal-video><source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" /><source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" /></video></div></dialog>
 
   <script src="script.js?v=7"></script>
   <script src="scroll-effects.js?v=1"></script>
