@@ -5,6 +5,8 @@
 }
 
 html,body,.welcome-shell{font-family:var(--font-ui)}
+html,body{max-width:100%;overflow-x:hidden;overscroll-behavior-x:none}
+.welcome-shell,.welcome-stage,.onboarding-stage{max-width:100vw;overflow-x:hidden}
 .welcome-brand,.welcome-center h1,.sheet-head h2,.terms-heading h2,.license-content h2,.faq-heading h3{
   font-family:var(--font-display);
 }
@@ -16,8 +18,8 @@ html,body,.welcome-shell{font-family:var(--font-ui)}
   font-weight:800;
 }
 .welcome-brand span,.welcome-brand b{display:inline-block}
-.welcome-brand span{animation:welcomeBrandIn .9s cubic-bezier(.16,1,.3,1) both}
-.welcome-brand b{animation:welcomeBrandIn .9s .08s cubic-bezier(.16,1,.3,1) both}
+.welcome-brand span{color:#f3f5f3;animation:welcomeBrandIn .9s cubic-bezier(.16,1,.3,1) both}
+.welcome-brand b{color:var(--green);animation:welcomeBrandIn .9s .08s cubic-bezier(.16,1,.3,1) both}
 
 .system-state{animation:welcomeFadeIn .8s .22s ease both}
 .welcome-kicker{animation:welcomeKickerIn 1s .16s cubic-bezier(.16,1,.3,1) both}
@@ -37,15 +39,14 @@ html,body,.welcome-shell{font-family:var(--font-ui)}
 }
 .welcome-title-line > span{
   display:block;
-  color:inherit;
+  color:#f3f5f3;
   transform:translate3d(0,112%,0) skewY(4deg);
   transform-origin:left bottom;
   animation:welcomeTitleReveal 1.18s .24s cubic-bezier(.16,1,.3,1) forwards;
 }
-.welcome-title-line.is-accent > span{
-  color:var(--green);
-  animation-delay:.36s;
-}
+.welcome-title-line.is-directive > span{animation-delay:.36s}
+.welcome-title-line .directive-word{color:#f3f5f3}
+.welcome-title-line .directive-mark{color:var(--green)}
 
 .welcome-copy{
   opacity:0;
@@ -132,6 +133,56 @@ html,body,.welcome-shell{font-family:var(--font-ui)}
 .onboarding-stage.is-active .license-content>.section-number{animation-delay:.10s}
 .onboarding-stage.is-active .license-content>h2{animation-delay:.17s}
 
+/* iOS/WKWebView: vertical-only license/document scrolling. */
+.license-content{
+  width:100%;
+  max-width:1120px;
+  min-width:0;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-x:none;
+  touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+  padding-left:2px;
+  padding-right:2px;
+}
+.license-content h2{
+  max-width:100%;
+  overflow:hidden;
+  padding-left:.02em;
+  padding-right:.04em;
+}
+.license-grid{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.license-grid article{
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.license-grid p,.faq-panel p,.faq-panel summary{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+/* License consent is a normal in-flow control; it must never inherit the hidden
+   entrance state used by the Terms consent bar. */
+.license-consent{
+  display:flex!important;
+  position:relative!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:100%;
+  max-width:100%;
+  margin-top:24px;
+  opacity:1!important;
+  visibility:visible!important;
+  transform:none!important;
+}
+
 @keyframes welcomeBrandIn{from{opacity:0;transform:translate3d(-14px,0,0);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes welcomeFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes welcomeKickerIn{from{opacity:0;letter-spacing:.42em;transform:translate3d(0,10px,0)}to{opacity:1;letter-spacing:.24em;transform:none}}
@@ -145,6 +196,16 @@ html,body,.welcome-shell{font-family:var(--font-ui)}
   .welcome-title-line{width:auto}
   .login-sheet{height:47svh;min-height:400px}
   .minecraft-login-button{min-height:62px}
+  .onboarding-stage{padding-left:18px;padding-right:18px}
+  .license-content{max-width:100%;padding-left:0;padding-right:0}
+  .license-content h2{
+    font-size:clamp(44px,14.5vw,54px)!important;
+    line-height:.91;
+    letter-spacing:-.045em;
+  }
+  .license-grid{margin-top:42px}
+  .license-grid article{padding:22px 18px}
+  .license-consent{margin-top:20px;padding-left:14px;padding-right:14px}
 }
 
 @media(prefers-reduced-motion:reduce){
