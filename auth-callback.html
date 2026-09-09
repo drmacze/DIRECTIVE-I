@@ -7,248 +7,67 @@
   <meta name="robots" content="noindex,nofollow" />
   <title>DIRECTIVE I — Microsoft Authentication</title>
   <style>
-    :root{--bg:#050707;--panel:#0a0e0c;--panel2:#0d120f;--line:rgba(255,255,255,.13);--line2:rgba(112,226,36,.28);--text:#f3f5f3;--muted:#8f9992;--muted2:#69736d;--green:#70e224;--ease:cubic-bezier(.16,1,.3,1)}
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}body{min-height:100svh;display:grid;place-items:center;padding:max(26px,env(safe-area-inset-top)) 22px max(28px,env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(circle at 50% 18%,rgba(112,226,36,.075),transparent 31%),radial-gradient(circle at 82% 80%,rgba(112,226,36,.025),transparent 25%),#050707}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:58px 58px;mask-image:linear-gradient(135deg,#000,transparent 82%)}
-    .auth-shell{width:min(680px,100%);position:relative;z-index:2;perspective:1200px}
-    .auth-card{position:relative;width:100%;min-height:690px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(14,20,16,.96),rgba(7,10,9,.985));padding:clamp(30px,7vw,58px);overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.28);transition:opacity .68s ease,transform .85s var(--ease),filter .68s ease}
-    .auth-card:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(112,226,36,.035),transparent 42%);pointer-events:none}
-    .auth-card:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:54px 54px;opacity:.22;pointer-events:none}
-    .auth-card.is-leaving{opacity:0;transform:translate3d(-5%,0,-30px) scale(.985);filter:blur(10px)}
-    .auth-card.is-entering{opacity:0;transform:translate3d(6%,0,-30px) scale(.985);filter:blur(10px)}
-    .layer{position:relative;z-index:2}
-    .brand{display:inline-flex;align-items:baseline;font-weight:950;font-size:clamp(25px,5.7vw,34px);letter-spacing:-.065em;line-height:1}.brand span{color:#f3f5f3}.brand b{color:var(--green);margin-left:.16em}
-    .micro{margin-top:54px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:9px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}.micro i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px rgba(112,226,36,.65);animation:pulse 1.2s ease-in-out infinite}
-    .title{margin:16px 0 0;font-size:clamp(52px,11vw,88px);line-height:.87;letter-spacing:-.075em;font-weight:950;max-width:560px}
-    .copy{margin:28px 0 0;max-width:560px;color:var(--muted);font-size:clamp(15px,2.3vw,18px);line-height:1.75}
-    .reveal-line{display:block;overflow:hidden}.reveal-line>span{display:block;transform:translateY(115%);opacity:0;animation:textIn .95s var(--ease) forwards}.reveal-line:nth-child(2)>span{animation-delay:.09s}.copy.reveal{opacity:0;transform:translateY(12px);animation:fadeUp .9s .32s var(--ease) forwards}.micro.reveal{opacity:0;transform:translateY(10px);animation:fadeUp .75s .15s var(--ease) forwards}
-    @keyframes textIn{to{transform:none;opacity:1}}@keyframes fadeUp{to{opacity:1;transform:none}}@keyframes pulse{50%{opacity:.38;transform:scale(.72)}}
-    .lifecycle{margin-top:46px;padding-top:18px;border-top:1px solid var(--line)}
-    .lifecycle-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;color:#a8b0ab;font-size:8px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.lifecycle-head strong{color:var(--green);font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em}.lifecycle-track{height:4px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}.lifecycle-bar{height:100%;width:0;background:linear-gradient(90deg,var(--green),#a6ff6a);box-shadow:0 0 16px rgba(112,226,36,.34);transition:width .32s ease}.lifecycle-scan{position:absolute;inset:0 auto 0 -24%;width:24%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:scan 1.25s linear infinite;mix-blend-mode:screen}@keyframes scan{to{transform:translateX(520%)}}
-    .actions{margin-top:28px}.actions a{display:flex;align-items:center;justify-content:center;min-height:56px;border:1px solid var(--green);background:var(--green);color:#071004;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}.actions[hidden]{display:none}
-    .profile-view{display:none}.profile-view.is-active{display:block}.profile-view .micro{margin-top:44px}.profile-view .title{font-size:clamp(48px,10vw,78px);max-width:600px}
-    .identity-card{margin-top:34px;border:1px solid var(--line);background:rgba(5,8,7,.62);overflow:hidden;opacity:0;transform:translateY(18px);animation:fadeUp .85s .2s var(--ease) forwards}
-    .identity-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:22px;border-bottom:1px solid var(--line)}
-    .avatar{width:70px;height:70px;border:1px solid var(--line2);background:#0c130e;display:grid;place-items:center;overflow:hidden;color:var(--green);font-weight:950;letter-spacing:.06em}.avatar img{width:100%;height:100%;object-fit:cover;display:block}.identity-name small{display:block;color:var(--green);font-size:8px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.identity-name strong{display:block;margin-top:7px;font-size:clamp(24px,5vw,34px);letter-spacing:-.035em}.identity-name span{display:block;margin-top:5px;color:var(--muted);font-size:11px}
-    .identity-grid{display:grid;grid-template-columns:1fr 1fr}.identity-grid div{min-width:0;padding:16px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.identity-grid div:nth-child(even){border-right:0}.identity-grid div:nth-last-child(-n+2){border-bottom:0}.identity-grid span,.identity-grid strong{display:block}.identity-grid span{color:var(--muted2);font-size:8px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.identity-grid strong{margin-top:7px;color:#dfe4e0;font-size:11px;line-height:1.45;word-break:break-word}
-    .countdown{margin-top:24px}.countdown-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;color:#8e9892;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.countdown-head strong{color:#dfe5e1;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace}.countdown-track{height:3px;background:rgba(255,255,255,.08);overflow:hidden}.countdown-bar{height:100%;width:100%;transform-origin:left;background:var(--green);box-shadow:0 0 14px rgba(112,226,36,.28)}
+    :root{--bg:#050707;--panel:#0a0e0c;--line:rgba(255,255,255,.13);--line2:rgba(112,226,36,.3);--text:#f4f6f4;--muted:#8f9992;--muted2:#67716b;--green:#70e224;--ease:cubic-bezier(.16,1,.3,1)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}body{min-height:100svh;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 18px max(26px,env(safe-area-inset-bottom));overflow-x:hidden;background:radial-gradient(circle at 50% 18%,rgba(112,226,36,.075),transparent 31%),#050707}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:58px 58px;mask-image:linear-gradient(135deg,#000,transparent 82%)}
+    .auth-shell{width:min(680px,100%);position:relative;z-index:2;perspective:1200px}.auth-card{position:relative;width:100%;min-height:690px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(14,20,16,.96),rgba(7,10,9,.985));padding:clamp(30px,7vw,58px);overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.28);transition:opacity .68s ease,transform .85s var(--ease),filter .68s ease}.auth-card:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(112,226,36,.035),transparent 42%);pointer-events:none}.auth-card:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:54px 54px;opacity:.22;pointer-events:none}.auth-card.is-leaving{opacity:0;transform:translate3d(-5%,0,-30px) scale(.985);filter:blur(10px)}.auth-card.is-entering{opacity:0;transform:translate3d(6%,0,-30px) scale(.985);filter:blur(10px)}.layer{position:relative;z-index:2}
+    .brand{display:inline-flex;align-items:baseline;font-weight:950;font-size:clamp(25px,5.7vw,34px);letter-spacing:-.065em;line-height:1}.brand span{color:#f3f5f3}.brand b{color:var(--green);margin-left:.16em}.micro{margin-top:50px;display:flex;align-items:center;gap:10px;color:var(--green);font-size:9px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}.micro i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px rgba(112,226,36,.65);animation:pulse 1.2s ease-in-out infinite}.title{margin:16px 0 0;font-size:clamp(52px,11vw,88px);line-height:.87;letter-spacing:-.075em;font-weight:950;max-width:560px}.copy{margin:28px 0 0;max-width:560px;color:var(--muted);font-size:clamp(15px,2.3vw,18px);line-height:1.75}.reveal-line{display:block;overflow:hidden}.reveal-line>span{display:block;transform:translateY(115%);opacity:0;animation:textIn .95s var(--ease) forwards}.reveal-line:nth-child(2)>span{animation-delay:.09s}.copy.reveal,.micro.reveal{opacity:0;transform:translateY(12px);animation:fadeUp .9s .28s var(--ease) forwards}.micro.reveal{animation-delay:.12s}@keyframes textIn{to{transform:none;opacity:1}}@keyframes fadeUp{to{opacity:1;transform:none}}@keyframes pulse{50%{opacity:.38;transform:scale(.72)}}
+    .lifecycle{margin-top:46px;padding-top:18px;border-top:1px solid var(--line)}.lifecycle-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;color:#a8b0ab;font-size:8px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.lifecycle-head strong{color:var(--green);font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace}.lifecycle-track{height:4px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}.lifecycle-bar{height:100%;width:0;background:linear-gradient(90deg,var(--green),#a6ff6a);box-shadow:0 0 16px rgba(112,226,36,.34);transition:width .32s ease}.lifecycle-scan{position:absolute;inset:0 auto 0 -24%;width:24%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:scan 1.25s linear infinite}@keyframes scan{to{transform:translateX(520%)}}.actions{margin-top:28px}.actions a{display:flex;align-items:center;justify-content:center;min-height:56px;border:1px solid var(--green);background:var(--green);color:#071004;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}.actions[hidden]{display:none}
+    .profile-view{display:none}.profile-view.is-active{display:block}.profile-view .micro{margin-top:38px}.profile-view .title{font-size:clamp(45px,9vw,72px);max-width:600px}.identity-card{margin-top:28px;border:1px solid var(--line);background:rgba(5,8,7,.62);overflow:hidden;opacity:0;transform:translateY(18px);animation:fadeUp .85s .16s var(--ease) forwards}.identity-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:20px;border-bottom:1px solid var(--line)}.avatar{width:68px;height:68px;border:1px solid var(--line2);background:#0c130e;display:grid;place-items:center;overflow:hidden;color:var(--green);font-weight:950;letter-spacing:.06em}.avatar img{width:100%;height:100%;object-fit:cover}.identity-name small{display:block;color:var(--green);font-size:8px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.identity-name strong{display:block;margin-top:7px;font-size:clamp(23px,5vw,33px);letter-spacing:-.035em}.identity-name span{display:block;margin-top:5px;color:var(--muted);font-size:11px}.identity-grid{display:grid;grid-template-columns:1fr 1fr}.identity-grid div{min-width:0;padding:15px 17px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.identity-grid div:nth-child(even){border-right:0}.identity-grid div:nth-last-child(-n+2){border-bottom:0}.identity-grid span,.identity-grid strong{display:block}.identity-grid span{color:var(--muted2);font-size:8px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.identity-grid strong{margin-top:7px;color:#dfe4e0;font-size:11px;line-height:1.45;word-break:break-word}
+    .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;opacity:0;transform:translateY(10px);animation:fadeUp .72s .42s var(--ease) forwards;transition:opacity .38s ease,transform .38s var(--ease)}.profile-actions.is-leaving{opacity:0;transform:translateY(8px);pointer-events:none}.profile-action{min-height:46px;border:1px solid var(--line);background:rgba(255,255,255,.018);color:#dce2dd;font-size:9px;font-weight:950;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:.2s ease}.profile-action:active{transform:scale(.985)}.profile-action.logout:hover,.profile-action.logout:focus-visible{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.045)}.profile-action.accept{border-color:var(--green);background:var(--green);color:#071004}.profile-action.accept:hover,.profile-action.accept:focus-visible{box-shadow:0 0 22px rgba(112,226,36,.18)}
+    .countdown{margin-top:20px;opacity:0;transform:translateY(10px);max-height:0;overflow:hidden;transition:opacity .48s ease,transform .58s var(--ease),max-height .58s var(--ease)}.countdown.is-active{opacity:1;transform:none;max-height:80px}.countdown-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;color:#8e9892;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.countdown-head strong{color:#dfe5e1;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace}.countdown-track{height:3px;background:rgba(255,255,255,.08);overflow:hidden}.countdown-bar{height:100%;width:100%;transform-origin:left;background:var(--green);box-shadow:0 0 14px rgba(112,226,36,.28)}
     .portal{position:fixed;inset:0;z-index:9999;pointer-events:none}.portal i{position:absolute;display:block;background:#000;transition:transform .9s cubic-bezier(.7,0,.2,1)}.portal-top{top:0;left:0;right:0;height:50%;transform:translateY(-101%)}.portal-bottom{bottom:0;left:0;right:0;height:50%;transform:translateY(101%)}.portal-left{left:0;top:0;bottom:0;width:50%;transform:translateX(-101%)}.portal-right{right:0;top:0;bottom:0;width:50%;transform:translateX(101%)}.portal.is-closing i{transform:translate(0,0)}
-    @media(max-width:620px){body{padding-inline:18px}.auth-card{min-height:640px;padding:30px 26px}.micro{margin-top:42px}.copy{font-size:14px}.identity-top{grid-template-columns:58px 1fr;padding:18px}.avatar{width:58px;height:58px}.identity-grid{grid-template-columns:1fr}.identity-grid div{border-right:0!important;border-bottom:1px solid var(--line)!important}.identity-grid div:last-child{border-bottom:0!important}.profile-view .title{font-size:clamp(42px,13vw,64px)}}
+    @media(max-width:620px){.auth-card{min-height:640px;padding:28px 24px}.micro{margin-top:38px}.copy{font-size:14px}.identity-top{grid-template-columns:58px 1fr;padding:17px}.avatar{width:58px;height:58px}.identity-grid{grid-template-columns:1fr}.identity-grid div{border-right:0!important;border-bottom:1px solid var(--line)!important}.identity-grid div:last-child{border-bottom:0!important}.profile-view .title{font-size:clamp(40px,12vw,58px)}.profile-actions{gap:8px}.profile-action{min-height:44px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
-  <main class="auth-shell">
-    <section class="auth-card" data-auth-card>
-      <div class="layer secure-view" data-secure-view>
-        <div class="brand"><span>DIRECTIVE</span><b>I</b></div>
-        <div class="micro reveal" data-status><i></i><span>Validating Microsoft response</span></div>
-        <h1 class="title" data-title>
-          <span class="reveal-line"><span>Securing Xbox</span></span>
-          <span class="reveal-line"><span>identity.</span></span>
-        </h1>
-        <p class="copy reveal" data-copy>DIRECTIVE I is validating the Microsoft authorization response, establishing Xbox trust, and resolving the connected player identity through the secure backend.</p>
+  <main class="auth-shell"><section class="auth-card" data-auth-card>
+    <div class="layer secure-view" data-secure-view>
+      <div class="brand"><span>DIRECTIVE</span><b>I</b></div>
+      <div class="micro reveal" data-status><i></i><span>Validating Microsoft response</span></div>
+      <h1 class="title" data-title><span class="reveal-line"><span>Securing Xbox</span></span><span class="reveal-line"><span>identity.</span></span></h1>
+      <p class="copy reveal" data-copy>DIRECTIVE I is validating the Microsoft authorization response, establishing Xbox trust, and resolving the connected player identity through the secure backend.</p>
+      <div class="lifecycle"><div class="lifecycle-head"><span data-lifecycle-label>Verification lifecycle</span><strong data-lifecycle-percent>0%</strong></div><div class="lifecycle-track"><div class="lifecycle-bar" data-lifecycle-bar></div><div class="lifecycle-scan" data-lifecycle-scan></div></div></div>
+      <div class="actions" data-actions hidden><a href="welcome.html">Return to secure access</a></div>
+    </div>
 
-        <div class="lifecycle" data-lifecycle>
-          <div class="lifecycle-head"><span data-lifecycle-label>Verification lifecycle</span><strong data-lifecycle-percent>0%</strong></div>
-          <div class="lifecycle-track"><div class="lifecycle-bar" data-lifecycle-bar></div><div class="lifecycle-scan" data-lifecycle-scan></div></div>
-        </div>
-
-        <div class="actions" data-actions hidden><a href="welcome.html">Return to secure access</a></div>
-      </div>
-
-      <div class="layer profile-view" data-profile-view>
-        <div class="brand"><span>DIRECTIVE</span><b>I</b></div>
-        <div class="micro reveal"><i></i><span>Xbox identity verified</span></div>
-        <h1 class="title">
-          <span class="reveal-line"><span>Access profile</span></span>
-          <span class="reveal-line"><span>confirmed.</span></span>
-        </h1>
-
-        <article class="identity-card">
-          <div class="identity-top">
-            <div class="avatar" data-avatar>MC</div>
-            <div class="identity-name">
-              <small>Verified Minecraft identity</small>
-              <strong data-gamertag>Player</strong>
-              <span data-display-name>Xbox profile</span>
-            </div>
-          </div>
-          <div class="identity-grid">
-            <div><span>Xbox user ID</span><strong data-xuid>—</strong></div>
-            <div><span>Gamerscore</span><strong data-gamerscore>—</strong></div>
-            <div><span>Provider</span><strong data-provider>Microsoft / Xbox</strong></div>
-            <div><span>Session</span><strong>Authenticated</strong></div>
-          </div>
-        </article>
-
-        <div class="countdown">
-          <div class="countdown-head"><span>Entering DIRECTIVE I</span><strong data-countdown>10.0s</strong></div>
-          <div class="countdown-track"><div class="countdown-bar" data-countdown-bar></div></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
+    <div class="layer profile-view" data-profile-view>
+      <div class="brand"><span>DIRECTIVE</span><b>I</b></div>
+      <div class="micro reveal"><i></i><span data-profile-status>Xbox identity verified</span></div>
+      <h1 class="title"><span class="reveal-line"><span>Access profile</span></span><span class="reveal-line"><span>confirmed.</span></span></h1>
+      <article class="identity-card">
+        <div class="identity-top"><div class="avatar" data-avatar>MC</div><div class="identity-name"><small>Verified Minecraft identity</small><strong data-gamertag>Player</strong><span data-display-name>Xbox profile</span></div></div>
+        <div class="identity-grid"><div><span>Xbox user ID</span><strong data-xuid>—</strong></div><div><span>Gamerscore</span><strong data-gamerscore>—</strong></div><div><span>Provider</span><strong data-provider>Microsoft / Xbox</strong></div><div><span>Session</span><strong>Authenticated</strong></div></div>
+      </article>
+      <div class="profile-actions" data-profile-actions><button class="profile-action logout" type="button" data-auth-logout>Log out</button><button class="profile-action accept" type="button" data-auth-accept>Accept</button></div>
+      <div class="countdown" data-countdown-wrap><div class="countdown-head"><span>Entering DIRECTIVE I</span><strong data-countdown>10.0s</strong></div><div class="countdown-track"><div class="countdown-bar" data-countdown-bar></div></div></div>
+    </div>
+  </section></main>
+  <audio data-auth-music preload="auto" loop src="https://drive.usercontent.google.com/download?id=1N96znfLcoSaPY-S0xVPlMO1V95fvxHK6&export=download&confirm=t"></audio>
   <div class="portal" data-portal aria-hidden="true"><i class="portal-top"></i><i class="portal-right"></i><i class="portal-bottom"></i><i class="portal-left"></i></div>
 
   <script>
-    (()=>{
-      const BACKEND='https://ydaeukhqwishlrjyfktk.supabase.co/functions/v1/minecraft-auth';
-      const p=new URLSearchParams(location.search);
-      const card=document.querySelector('[data-auth-card]');
-      const secureView=document.querySelector('[data-secure-view]');
-      const profileView=document.querySelector('[data-profile-view]');
-      const status=document.querySelector('[data-status] span');
-      const title=document.querySelector('[data-title]');
-      const copy=document.querySelector('[data-copy]');
-      const actions=document.querySelector('[data-actions]');
-      const lifecycleBar=document.querySelector('[data-lifecycle-bar]');
-      const lifecyclePercent=document.querySelector('[data-lifecycle-percent]');
-      const lifecycleLabel=document.querySelector('[data-lifecycle-label]');
-      const lifecycleScan=document.querySelector('[data-lifecycle-scan]');
-      const portal=document.querySelector('[data-portal]');
-
-      let progress=0;
-      let progressTarget=12;
-      let progressFrame=0;
-      const setProgress=(value,label)=>{
-        progress=Math.max(progress,Math.min(100,value));
-        lifecycleBar.style.width=`${progress}%`;
-        lifecyclePercent.textContent=`${Math.round(progress)}%`;
-        if(label) lifecycleLabel.textContent=label;
-      };
-      const driveProgress=()=>{
-        if(progress<progressTarget){
-          const delta=Math.max(.08,(progressTarget-progress)*.025);
-          setProgress(Math.min(progressTarget,progress+delta));
-        }
-        progressFrame=requestAnimationFrame(driveProgress);
-      };
-      driveProgress();
-      setTimeout(()=>{progressTarget=Math.max(progressTarget,34);setProgress(progress,'Microsoft authorization');},350);
-      setTimeout(()=>{progressTarget=Math.max(progressTarget,58);setProgress(progress,'Xbox user authentication');},950);
-      setTimeout(()=>{progressTarget=Math.max(progressTarget,76);setProgress(progress,'XSTS trust validation');},1650);
-      setTimeout(()=>{progressTarget=Math.max(progressTarget,88);setProgress(progress,'Resolving player profile');},2400);
-
-      const setFailure=(heading,message)=>{
-        cancelAnimationFrame(progressFrame);
-        lifecycleScan.style.display='none';
-        setProgress(Math.max(progress,100),'Verification interrupted');
-        status.textContent='Authentication was not completed';
-        title.innerHTML=`<span class="reveal-line"><span style="animation:none;transform:none;opacity:1">${heading}</span></span>`;
-        copy.textContent=message;
-        actions.hidden=false;
-      };
-
-      if(p.has('error')){
-        setFailure('Sign-in cancelled.',p.get('error_description')||'The Microsoft authorization request did not complete. Return to DIRECTIVE I and try again.');
-        return;
-      }
-
-      const code=p.get('code')||'';
-      const returnedState=p.get('state')||'';
-      let expectedState='';
-      try{expectedState=sessionStorage.getItem('directive_microsoft_oauth_state')||'';}catch(_){}
-
-      if(!code){
-        setFailure('Callback ready.','This secure callback endpoint is active. Start authentication from the DIRECTIVE I welcome page.');
-        return;
-      }
-      if(!expectedState||!returnedState||expectedState!==returnedState){
-        setFailure('Security check failed.','The Microsoft sign-in state did not match this browser session. Return to DIRECTIVE I and start login again.');
-        return;
-      }
-      try{sessionStorage.removeItem('directive_microsoft_oauth_state');}catch(_){}
-
-      const saveProfile=(account)=>{
-        const profile={
-          gamertag:account?.gamertag||'',
-          xuid:String(account?.xuid||''),
-          displayName:account?.displayName||account?.gamertag||'',
-          gamerpic:account?.gamerpic||'',
-          gamerscore:String(account?.gamerscore||''),
-          provider:account?.provider||'Microsoft/Xbox',
-          authenticated:true,
-          updatedAt:Date.now()
-        };
-        try{
-          localStorage.setItem('directive_minecraft_profile',JSON.stringify(profile));
-          localStorage.setItem('directive_local_session',String(Date.now()));
-          localStorage.setItem('directive_onboarding_complete','1');
-          const count=Number(localStorage.getItem('directive_account_logins')||0)||0;
-          localStorage.setItem('directive_account_logins',String(count+1));
-          sessionStorage.setItem('directive_minecraft_account',JSON.stringify(profile));
-          sessionStorage.setItem('directive_minecraft_gamertag',profile.gamertag);
-          sessionStorage.setItem('directive_minecraft_xuid',profile.xuid);
-        }catch(_){}
-        return profile;
-      };
-
-      const showProfile=(account)=>{
-        const profile=saveProfile(account);
-        cancelAnimationFrame(progressFrame);
-        progressTarget=100;
-        setProgress(100,'Identity verification complete');
-        lifecycleScan.style.display='none';
-        status.textContent='Xbox identity verified';
-
-        setTimeout(()=>{
-          card.classList.add('is-leaving');
-          setTimeout(()=>{
-            secureView.style.display='none';
-            profileView.classList.add('is-active');
-            card.classList.remove('is-leaving');
-            card.classList.add('is-entering');
-
-            document.querySelector('[data-gamertag]').textContent=profile.gamertag||'Minecraft player';
-            document.querySelector('[data-display-name]').textContent=profile.displayName||'Xbox profile';
-            document.querySelector('[data-xuid]').textContent=profile.xuid||'Unavailable';
-            document.querySelector('[data-gamerscore]').textContent=profile.gamerscore||'0';
-            document.querySelector('[data-provider]').textContent=profile.provider||'Microsoft / Xbox';
-            const avatar=document.querySelector('[data-avatar]');
-            avatar.textContent=(profile.gamertag||'MC').slice(0,2).toUpperCase();
-            if(profile.gamerpic){
-              const img=new Image();
-              img.alt=`${profile.gamertag||'Minecraft'} avatar`;
-              img.referrerPolicy='no-referrer';
-              img.onload=()=>{avatar.textContent='';avatar.appendChild(img)};
-              img.src=profile.gamerpic;
-            }
-
-            requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.remove('is-entering')));
-
-            const countdown=document.querySelector('[data-countdown]');
-            const bar=document.querySelector('[data-countdown-bar]');
-            const start=performance.now();
-            const duration=10000;
-            const tick=(now)=>{
-              const elapsed=Math.min(duration,now-start);
-              const remaining=Math.max(0,duration-elapsed);
-              countdown.textContent=`${(remaining/1000).toFixed(1)}s`;
-              bar.style.transform=`scaleX(${remaining/duration})`;
-              if(elapsed<duration){requestAnimationFrame(tick);return;}
-
-              card.classList.add('is-leaving');
-              setTimeout(()=>{
-                try{sessionStorage.setItem('directive_home_entry','1')}catch(_){}
-                portal.classList.add('is-closing');
-                setTimeout(()=>location.replace('index.html?auth=success'),920);
-              },520);
-            };
-            requestAnimationFrame(tick);
-          },680);
-        },520);
-      };
-
-      fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
-        .then(async response=>{
-          const data=await response.json().catch(()=>({}));
-          if(!response.ok||!data?.ok||!data?.account)throw new Error(data?.error||`Secure backend returned HTTP ${response.status}.`);
-          showProfile(data.account);
-        })
-        .catch(error=>setFailure('Verification failed.',error?.message||'The secure Minecraft/Xbox authentication backend could not verify this account.'));
-    })();
+  (()=>{
+    const BACKEND='https://ydaeukhqwishlrjyfktk.supabase.co/functions/v1/minecraft-auth';
+    const p=new URLSearchParams(location.search),card=document.querySelector('[data-auth-card]'),secureView=document.querySelector('[data-secure-view]'),profileView=document.querySelector('[data-profile-view]'),status=document.querySelector('[data-status] span'),title=document.querySelector('[data-title]'),copy=document.querySelector('[data-copy]'),actions=document.querySelector('[data-actions]'),lifecycleBar=document.querySelector('[data-lifecycle-bar]'),lifecyclePercent=document.querySelector('[data-lifecycle-percent]'),lifecycleLabel=document.querySelector('[data-lifecycle-label]'),lifecycleScan=document.querySelector('[data-lifecycle-scan]'),portal=document.querySelector('[data-portal]'),music=document.querySelector('[data-auth-music]');
+    let progress=0,progressTarget=12,progressFrame=0,accepted=false,profile=null,musicStoreTimer=0;
+    const setProgress=(v,label)=>{progress=Math.max(progress,Math.min(100,v));lifecycleBar.style.width=`${progress}%`;lifecyclePercent.textContent=`${Math.round(progress)}%`;if(label)lifecycleLabel.textContent=label};
+    const driveProgress=()=>{if(progress<progressTarget)setProgress(Math.min(progressTarget,progress+Math.max(.08,(progressTarget-progress)*.025)));progressFrame=requestAnimationFrame(driveProgress)};driveProgress();
+    setTimeout(()=>{progressTarget=34;setProgress(progress,'Microsoft authorization')},350);setTimeout(()=>{progressTarget=58;setProgress(progress,'Xbox user authentication')},950);setTimeout(()=>{progressTarget=76;setProgress(progress,'XSTS trust validation')},1650);setTimeout(()=>{progressTarget=88;setProgress(progress,'Resolving player profile')},2400);
+    const setFailure=(heading,message)=>{cancelAnimationFrame(progressFrame);lifecycleScan.style.display='none';setProgress(100,'Verification interrupted');status.textContent='Authentication was not completed';title.innerHTML=`<span class="reveal-line"><span style="animation:none;transform:none;opacity:1">${heading}</span></span>`;copy.textContent=message;actions.hidden=false};
+    if(p.has('error')){setFailure('Sign-in cancelled.',p.get('error_description')||'The Microsoft authorization request did not complete.');return}
+    const code=p.get('code')||'',returnedState=p.get('state')||'';let expectedState='';try{expectedState=sessionStorage.getItem('directive_microsoft_oauth_state')||''}catch(_){}
+    if(!code){setFailure('Callback ready.','Start authentication from the DIRECTIVE I welcome page.');return}if(!expectedState||!returnedState||expectedState!==returnedState){setFailure('Security check failed.','The Microsoft sign-in state did not match this browser session. Start login again.');return}try{sessionStorage.removeItem('directive_microsoft_oauth_state')}catch(_){}
+    const saveProfile=account=>{const v={gamertag:account?.gamertag||'',xuid:String(account?.xuid||''),displayName:account?.displayName||account?.gamertag||'',gamerpic:account?.gamerpic||'',gamerscore:String(account?.gamerscore||''),provider:account?.provider||'Microsoft/Xbox',authenticated:true,updatedAt:Date.now()};try{localStorage.setItem('directive_minecraft_profile',JSON.stringify(v));localStorage.setItem('directive_local_session',String(Date.now()));sessionStorage.setItem('directive_minecraft_account',JSON.stringify(v));sessionStorage.setItem('directive_minecraft_gamertag',v.gamertag);sessionStorage.setItem('directive_minecraft_xuid',v.xuid)}catch(_){}return v};
+    const persistMusic=()=>{try{sessionStorage.setItem('directive_music_time',String(Number.isFinite(music.currentTime)?music.currentTime:0));sessionStorage.setItem('directive_music_saved_at',String(Date.now()))}catch(_){}};
+    const goHome=()=>{persistMusic();card.classList.add('is-leaving');setTimeout(()=>{try{localStorage.setItem('directive_onboarding_complete','1');sessionStorage.setItem('directive_home_entry','1')}catch(_){}portal.classList.add('is-closing');setTimeout(()=>location.replace('index.html?auth=success&music=1'),920)},520)};
+    const startCountdown=()=>{const wrap=document.querySelector('[data-countdown-wrap]'),countdown=document.querySelector('[data-countdown]'),bar=document.querySelector('[data-countdown-bar]');wrap.classList.add('is-active');const start=performance.now(),duration=10000;const tick=now=>{const elapsed=Math.min(duration,now-start),remaining=Math.max(0,duration-elapsed);countdown.textContent=`${(remaining/1000).toFixed(1)}s`;bar.style.transform=`scaleX(${remaining/duration})`;if(elapsed<duration){requestAnimationFrame(tick);return}goHome()};requestAnimationFrame(tick)};
+    const accept=()=>{if(accepted)return;accepted=true;const row=document.querySelector('[data-profile-actions]'),profileStatus=document.querySelector('[data-profile-status]');row.classList.add('is-leaving');profileStatus.textContent='Season I audio channel accepted';try{sessionStorage.setItem('directive_music_enabled','1');sessionStorage.setItem('directive_music_should_play','1');sessionStorage.setItem('directive_music_title','Directive I - S1')}catch(_){};music.volume=.72;const promise=music.play();if(promise?.catch)promise.catch(()=>{});musicStoreTimer=setInterval(persistMusic,500);setTimeout(()=>{row.style.display='none';startCountdown()},360)};
+    const logout=()=>{if(accepted)return;try{localStorage.removeItem('directive_minecraft_profile');localStorage.removeItem('directive_local_session');localStorage.removeItem('directive_onboarding_complete');['directive_minecraft_account','directive_minecraft_gamertag','directive_minecraft_xuid','directive_home_entry','directive_music_enabled','directive_music_should_play','directive_music_time','directive_music_saved_at'].forEach(k=>sessionStorage.removeItem(k));sessionStorage.setItem('directive_logout_reveal','1')}catch(_){}portal.classList.add('is-closing');setTimeout(()=>location.replace('welcome.html?logout=1&v=76'),920)};
+    document.querySelector('[data-auth-accept]')?.addEventListener('click',accept);document.querySelector('[data-auth-logout]')?.addEventListener('click',logout);window.addEventListener('pagehide',()=>{clearInterval(musicStoreTimer);persistMusic()});
+    const showProfile=account=>{profile=saveProfile(account);cancelAnimationFrame(progressFrame);setProgress(100,'Identity verification complete');lifecycleScan.style.display='none';status.textContent='Xbox identity verified';setTimeout(()=>{card.classList.add('is-leaving');setTimeout(()=>{secureView.style.display='none';profileView.classList.add('is-active');card.classList.remove('is-leaving');card.classList.add('is-entering');document.querySelector('[data-gamertag]').textContent=profile.gamertag||'Minecraft player';document.querySelector('[data-display-name]').textContent=profile.displayName||'Xbox profile';document.querySelector('[data-xuid]').textContent=profile.xuid||'Unavailable';document.querySelector('[data-gamerscore]').textContent=profile.gamerscore||'0';document.querySelector('[data-provider]').textContent=profile.provider||'Microsoft / Xbox';const avatar=document.querySelector('[data-avatar]');avatar.textContent=(profile.gamertag||'MC').slice(0,2).toUpperCase();if(profile.gamerpic){const img=new Image();img.alt=`${profile.gamertag||'Minecraft'} avatar`;img.referrerPolicy='no-referrer';img.onload=()=>{avatar.textContent='';avatar.appendChild(img)};img.src=profile.gamerpic}requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.remove('is-entering')))},680)},520)};
+    fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok||!d?.ok||!d?.account)throw new Error(d?.error||`Secure backend returned HTTP ${r.status}.`);showProfile(d.account)}).catch(e=>setFailure('Verification failed.',e?.message||'The secure Minecraft/Xbox authentication backend could not verify this account.'));
+  })();
   </script>
 </body>
 </html>
