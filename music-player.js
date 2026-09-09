@@ -387,7 +387,7 @@
 
   if (pendingProfile) {
     const profileScript = document.createElement('script');
-    profileScript.src = 'home-auth-profile.js?v=1';
+    profileScript.src = 'home-auth-profile.js?v=2';
     profileScript.async = false;
     document.body.appendChild(profileScript);
   }
