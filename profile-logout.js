@@ -1,6 +1,14 @@
 (() => {
   const PROFILE_KEY = 'directive_minecraft_profile';
   const LOGOUT_REVEAL_KEY = 'directive_logout_reveal';
+  const MUSIC_KEYS = [
+    'directive_music_enabled',
+    'directive_music_should_play',
+    'directive_music_track',
+    'directive_music_title',
+    'directive_music_time',
+    'directive_music_saved_at'
+  ];
 
   function installStyles() {
     if (document.getElementById('directive-profile-logout-style')) return;
@@ -31,18 +39,24 @@
     } catch (_) {}
 
     try {
-      sessionStorage.removeItem('directive_minecraft_gamertag');
-      sessionStorage.removeItem('directive_minecraft_xuid');
-      sessionStorage.removeItem('directive_minecraft_account');
-      sessionStorage.removeItem('directive_home_entry');
-      sessionStorage.removeItem('directive_microsoft_oauth_state');
-      sessionStorage.removeItem('directive_play_counted_session');
+      [
+        'directive_minecraft_gamertag',
+        'directive_minecraft_xuid',
+        'directive_minecraft_account',
+        'directive_home_entry',
+        'directive_pending_profile',
+        'directive_microsoft_oauth_state',
+        'directive_play_counted_session',
+        ...MUSIC_KEYS
+      ].forEach(key => sessionStorage.removeItem(key));
       sessionStorage.setItem(LOGOUT_REVEAL_KEY, '1');
     } catch (_) {}
   }
 
   function runLogout() {
     if (document.querySelector('.profile-logout-transition')) return;
+
+    window.DIRECTIVE_MUSIC?.stopAndReset?.();
 
     const overlay = document.createElement('div');
     overlay.className = 'profile-logout-transition';
@@ -56,7 +70,7 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.setTimeout(() => {
       clearDirectiveSession();
-      window.location.replace('welcome.html?logout=1&v=65');
+      window.location.replace('welcome.html?logout=1&v=87');
     }, reduced ? 30 : 920);
   }
 
