@@ -192,3 +192,7 @@ modal?.addEventListener('close', () => {
   modalVideo?.pause();
   scheduleHeroResume(40);
 });
+
+// Privacy controls are isolated from the cinematic playback code so consent UI
+// cannot interrupt the hero video on iOS/WKWebView.
+import('./cookie.js?v=1').catch(() => {});
