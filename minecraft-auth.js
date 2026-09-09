@@ -6,6 +6,10 @@
   const profileMeta = document.querySelector('[data-minecraft-profile-meta]');
   if (!button) return;
 
+  const CLIENT_ID = '8d96f158-bac2-4305-856f-fe6be31b2404';
+  const REDIRECT_URI = 'https://drmacze.github.io/DIRECTIVE-I/auth-callback.html';
+  const AUTHORIZE_URL = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize';
+
   const setStatus = (message, state = '') => {
     if (!status) return;
     status.textContent = message;
@@ -17,56 +21,68 @@
     const safeAccount = {
       gamertag: account?.gamertag || '',
       xuid: account?.xuid || '',
-      minecraftId: account?.minecraftId || '',
+      displayName: account?.displayName || '',
+      gamerpic: account?.gamerpic || '',
+      gamerscore: account?.gamerscore || '',
+      provider: account?.provider || 'Microsoft/Xbox',
       authenticated: true
     };
 
     if (gamertag) gamertag.textContent = safeAccount.gamertag || 'Minecraft account connected';
-    if (profileMeta) profileMeta.textContent = safeAccount.xuid
-      ? `Xbox profile verified · XUID ${safeAccount.xuid}`
-      : 'Microsoft/Xbox profile verified';
+    if (profileMeta) {
+      const suffix = safeAccount.xuid ? ` · XUID ${safeAccount.xuid}` : '';
+      profileMeta.textContent = `Xbox profile verified${suffix}`;
+    }
     profile?.removeAttribute('hidden');
     setStatus('Minecraft identity verified. Continuing secure onboarding…', 'ready');
 
     window.dispatchEvent(new CustomEvent('directive:minecraft-authenticated', { detail: safeAccount }));
   };
 
+  try {
+    const returned = sessionStorage.getItem('directive_minecraft_account');
+    if (returned) {
+      sessionStorage.removeItem('directive_minecraft_account');
+      const parsed = JSON.parse(returned);
+      button.disabled = true;
+      completeAuth(parsed);
+      return;
+    }
+  } catch (_) {}
+
   button.addEventListener('click', async () => {
     if (button.disabled) return;
-    button.disabled = true;
-    setStatus('Opening Microsoft / Xbox secure sign-in…');
-
-    /*
-      Production hook.
-      A real Minecraft account flow must be connected to an officially registered
-      Microsoft/Xbox application. Do not place client secrets in GitHub Pages.
-      When the external auth adapter is installed it should expose:
-        window.DIRECTIVE_MINECRAFT_AUTH.signIn()
-      and resolve with { gamertag, xuid, minecraftId } only after Xbox/Minecraft
-      identity has been verified.
-    */
-    const adapter = window.DIRECTIVE_MINECRAFT_AUTH;
-
-    if (adapter && typeof adapter.signIn === 'function') {
-      try {
-        const account = await adapter.signIn();
-        if (!account) throw new Error('No Minecraft account returned.');
-        completeAuth(account);
-        return;
-      } catch (error) {
-        setStatus(error?.message || 'Minecraft sign-in failed. Please try again.', 'error');
-        button.disabled = false;
-        return;
-      }
-    }
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('preview') === '1') {
-      setTimeout(() => completeAuth({ gamertag: 'Developer Preview', xuid: '', minecraftId: '' }), 650);
+      button.disabled = true;
+      setStatus('Previewing verified Minecraft identity…');
+      setTimeout(() => completeAuth({ gamertag: 'Developer Preview', xuid: '', provider: 'Preview' }), 650);
       return;
     }
 
-    setStatus('Minecraft sign-in needs the Microsoft/Xbox application registration before it can authenticate real players.', 'error');
-    button.disabled = false;
+    button.disabled = true;
+    setStatus('Opening Microsoft secure sign-in…');
+
+    try {
+      const stateBytes = new Uint8Array(24);
+      crypto.getRandomValues(stateBytes);
+      const state = Array.from(stateBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+      sessionStorage.setItem('directive_microsoft_oauth_state', state);
+
+      const auth = new URL(AUTHORIZE_URL);
+      auth.searchParams.set('client_id', CLIENT_ID);
+      auth.searchParams.set('response_type', 'code');
+      auth.searchParams.set('redirect_uri', REDIRECT_URI);
+      auth.searchParams.set('response_mode', 'query');
+      auth.searchParams.set('scope', 'xboxlive.signin xboxlive.offline_access');
+      auth.searchParams.set('state', state);
+      auth.searchParams.set('prompt', 'select_account');
+
+      window.location.assign(auth.toString());
+    } catch (error) {
+      setStatus(error?.message || 'Could not start Microsoft sign-in. Please try again.', 'error');
+      button.disabled = false;
+    }
   });
 })();
