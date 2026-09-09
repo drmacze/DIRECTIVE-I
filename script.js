@@ -8,8 +8,8 @@ const trailerPreview = document.querySelector('[data-trailer-preview]');
 const openTrailerButtons = document.querySelectorAll('[data-open-trailer]');
 const closeTrailerButton = document.querySelector('[data-close-trailer]');
 
-const HERO_BACKGROUND_URL = 'https://image-link.edgeone.app/1788957619264-ml7zjo.mp4';
-const HERO_LOCAL_FALLBACK = 'assets/directive-i-transmission-001.mp4';
+const HERO_BACKGROUND_URL = 'assets/directive-i-hero.mp4';
+const HERO_FALLBACK_URL = 'assets/directive-i-transmission-001.mp4';
 
 const syncHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
 syncHeader();
@@ -33,84 +33,83 @@ menuButton?.addEventListener('click', () => {
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 
-let heroInView = true;
 let usingHeroFallback = false;
-let recoveryTimer = 0;
+let heroRecoveryTimer = 0;
 
-function heroShouldPlay() {
-  return Boolean(heroVideo && !document.hidden && !modal?.open && heroInView);
+function heroCanPlay() {
+  return Boolean(heroVideo && !document.hidden && !modal?.open);
 }
 
-function setHeroSource(src) {
+function configureHeroVideo() {
   if (!heroVideo) return;
-  heroVideo.src = src;
+  heroVideo.preload = 'auto';
+  heroVideo.autoplay = true;
+  heroVideo.muted = true;
+  heroVideo.defaultMuted = true;
+  heroVideo.loop = true;
+  heroVideo.playsInline = true;
+  heroVideo.setAttribute('playsinline', '');
+  heroVideo.setAttribute('webkit-playsinline', '');
+  heroVideo.setAttribute('disablepictureinpicture', '');
+  heroVideo.src = HERO_BACKGROUND_URL;
   heroVideo.load();
 }
 
-function playHero({ resetIfEnded = false } = {}) {
-  if (!heroShouldPlay() || !heroVideo) return;
-  heroVideo.muted = true;
-  heroVideo.loop = true;
-  heroVideo.playsInline = true;
-  if (resetIfEnded && (heroVideo.ended || (Number.isFinite(heroVideo.duration) && heroVideo.currentTime >= heroVideo.duration - 0.08))) {
+function resumeHero(reset = false) {
+  if (!heroCanPlay() || !heroVideo) return;
+  if (reset || heroVideo.ended) {
     try { heroVideo.currentTime = 0; } catch (_) {}
   }
-  if (heroVideo.paused || heroVideo.ended) heroVideo.play().catch(() => {});
+  const promise = heroVideo.play();
+  if (promise?.catch) promise.catch(() => {});
 }
 
-function scheduleHeroRecovery(delay = 350) {
-  window.clearTimeout(recoveryTimer);
-  recoveryTimer = window.setTimeout(() => playHero({ resetIfEnded: true }), delay);
+function recoverHero(delay = 250) {
+  window.clearTimeout(heroRecoveryTimer);
+  heroRecoveryTimer = window.setTimeout(() => {
+    if (!heroCanPlay() || !heroVideo) return;
+
+    if (heroVideo.ended || (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0 && heroVideo.currentTime >= heroVideo.duration - 0.12)) {
+      resumeHero(true);
+      return;
+    }
+
+    if (heroVideo.paused) resumeHero(false);
+  }, delay);
 }
 
 if (heroVideo) {
-  heroVideo.preload = 'auto';
-  heroVideo.muted = true;
-  heroVideo.loop = true;
-  heroVideo.setAttribute('playsinline', '');
-  heroVideo.setAttribute('webkit-playsinline', '');
+  configureHeroVideo();
 
-  // Force the direct source once so iOS does not stay on an older locally cached asset.
-  setHeroSource(HERO_BACKGROUND_URL);
-
-  heroVideo.addEventListener('loadeddata', () => playHero());
-  heroVideo.addEventListener('canplay', () => playHero());
-  heroVideo.addEventListener('ended', () => playHero({ resetIfEnded: true }));
+  heroVideo.addEventListener('loadedmetadata', () => resumeHero(false));
+  heroVideo.addEventListener('canplay', () => resumeHero(false));
+  heroVideo.addEventListener('ended', () => resumeHero(true));
   heroVideo.addEventListener('pause', () => {
-    if (heroShouldPlay()) scheduleHeroRecovery(180);
+    if (heroCanPlay()) recoverHero(180);
   });
-  heroVideo.addEventListener('stalled', () => {
-    if (heroShouldPlay()) scheduleHeroRecovery(700);
-  });
-  heroVideo.addEventListener('waiting', () => {
-    if (heroShouldPlay()) scheduleHeroRecovery(700);
-  });
+  heroVideo.addEventListener('waiting', () => recoverHero(500));
+  heroVideo.addEventListener('stalled', () => recoverHero(700));
+  heroVideo.addEventListener('suspend', () => recoverHero(500));
   heroVideo.addEventListener('error', () => {
     if (usingHeroFallback) return;
     usingHeroFallback = true;
-    setHeroSource(HERO_LOCAL_FALLBACK);
-    playHero();
+    heroVideo.src = HERO_FALLBACK_URL;
+    heroVideo.load();
+    resumeHero(false);
   });
 
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      heroInView = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.08);
-      if (heroInView) playHero({ resetIfEnded: true });
-      else heroVideo.pause();
-    }, { threshold: [0, 0.08, 0.25] });
-    observer.observe(heroVideo.closest('.hero') || heroVideo);
-  }
+  // iOS may suspend muted video after a navigation/UI interruption.
+  // Restore playback whenever the page becomes active again.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !modal?.open) resumeHero(false);
+  });
+  window.addEventListener('pageshow', () => resumeHero(false));
+  window.addEventListener('focus', () => resumeHero(false));
+  document.addEventListener('touchstart', () => {
+    if (heroCanPlay() && heroVideo.paused) resumeHero(false);
+  }, { passive: true });
 
-  // Safari/iOS can pause muted background video after temporary network or memory pressure.
-  // Resume only while the hero is visible and no trailer modal is open.
-  window.setInterval(() => {
-    if (heroShouldPlay() && (heroVideo.paused || heroVideo.ended)) {
-      playHero({ resetIfEnded: true });
-    }
-  }, 2000);
-
-  playHero();
+  resumeHero(false);
 }
 
 function openTrailer() {
@@ -129,7 +128,7 @@ function closeTrailer() {
   modalVideo?.pause();
   if (typeof modal.close === 'function') modal.close();
   else modal.removeAttribute('open');
-  playHero({ resetIfEnded: true });
+  resumeHero(false);
   trailerPreview?.play().catch(() => {});
 }
 
@@ -147,19 +146,6 @@ modal?.addEventListener('cancel', (event) => {
 
 modal?.addEventListener('close', () => {
   modalVideo?.pause();
-  playHero({ resetIfEnded: true });
+  resumeHero(false);
   trailerPreview?.play().catch(() => {});
 });
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    heroVideo?.pause();
-    trailerPreview?.pause();
-  } else if (!modal?.open) {
-    playHero({ resetIfEnded: true });
-    trailerPreview?.play().catch(() => {});
-  }
-});
-
-window.addEventListener('pageshow', () => playHero({ resetIfEnded: true }));
-window.addEventListener('focus', () => playHero({ resetIfEnded: true }));
