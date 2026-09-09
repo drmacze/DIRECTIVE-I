@@ -8,39 +8,45 @@
   <title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Cinematic hero clarity pass: preserve the source and keep overlays light. */
+    /* iOS-safe cinematic compositing: keep video in the normal positive z-stack.
+       Negative-z video layers can visually freeze in some WKWebView/Safari paths. */
     .hero-video {
+      z-index: 0 !important;
       filter: none !important;
       transform: none !important;
       object-fit: cover !important;
       object-position: center center !important;
       image-rendering: auto;
-      backface-visibility: hidden;
       background: #050606;
+      pointer-events: none;
     }
     .hero-vignette {
+      z-index: 1 !important;
       background:
-        linear-gradient(90deg, rgba(4,6,6,.60) 0%, rgba(4,6,6,.34) 36%, rgba(4,6,6,.06) 70%, rgba(4,6,6,.10) 100%),
-        linear-gradient(0deg, rgba(7,9,9,.84) 0%, rgba(7,9,9,.10) 34%, rgba(7,9,9,.05) 74%, rgba(7,9,9,.14) 100%) !important;
+        linear-gradient(90deg, rgba(4,6,6,.56) 0%, rgba(4,6,6,.30) 36%, rgba(4,6,6,.04) 70%, rgba(4,6,6,.08) 100%),
+        linear-gradient(0deg, rgba(7,9,9,.80) 0%, rgba(7,9,9,.08) 34%, rgba(7,9,9,.04) 74%, rgba(7,9,9,.12) 100%) !important;
     }
-    .hero-copy {
-      text-shadow: 0 2px 28px rgba(0,0,0,.60);
-    }
+    .hero-grid { z-index: 2 !important; }
+    .hero-content { position: relative; z-index: 3; }
+    .scroll-cue { z-index: 3; }
+    .hero-copy { text-shadow: 0 2px 28px rgba(0,0,0,.62); }
+
     @media (max-width: 900px) {
       .hero-video { object-position: center center !important; }
       .hero-vignette {
         background:
-          linear-gradient(90deg, rgba(4,6,6,.44) 0%, rgba(4,6,6,.20) 58%, rgba(4,6,6,.04) 100%),
-          linear-gradient(0deg, rgba(7,9,9,.86) 0%, rgba(7,9,9,.12) 42%, rgba(7,9,9,.08) 100%) !important;
+          linear-gradient(90deg, rgba(4,6,6,.40) 0%, rgba(4,6,6,.17) 58%, rgba(4,6,6,.03) 100%),
+          linear-gradient(0deg, rgba(7,9,9,.82) 0%, rgba(7,9,9,.10) 42%, rgba(7,9,9,.06) 100%) !important;
       }
     }
+
     @media (max-width: 620px) {
       .hero-vignette {
         background:
-          linear-gradient(0deg, rgba(7,9,9,.88) 0%, rgba(7,9,9,.34) 31%, rgba(7,9,9,.05) 66%, rgba(7,9,9,.10) 100%) !important;
+          linear-gradient(0deg, rgba(7,9,9,.83) 0%, rgba(7,9,9,.29) 31%, rgba(7,9,9,.04) 66%, rgba(7,9,9,.08) 100%) !important;
       }
-      .hero-copy { text-shadow: 0 2px 24px rgba(0,0,0,.68); }
-      .hero-meta { background: rgba(5,7,7,.50); }
+      .hero-copy { text-shadow: 0 2px 24px rgba(0,0,0,.70); }
+      .hero-meta { background: rgba(5,7,7,.46); }
     }
   </style>
 </head>
@@ -75,9 +81,21 @@
 
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true" data-hero-video>
-        <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
-        <source src="https://image-link.edgeone.app/1788957619264-ml7zjo.mp4" type="video/mp4" />
+      <video
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        webkit-playsinline
+        preload="auto"
+        poster="assets/directive-i-hero-poster.jpg?v=4"
+        disablepictureinpicture
+        x-webkit-airplay="deny"
+        aria-hidden="true"
+        data-hero-video>
+        <source src="assets/directive-i-hero-1080.mp4?v=4" type="video/mp4" />
+        <source src="assets/directive-i-transmission-001.mp4?v=4" type="video/mp4" />
       </video>
       <div class="hero-vignette" aria-hidden="true"></div>
       <div class="hero-grid" aria-hidden="true"></div>
@@ -141,8 +159,16 @@
 
       <div class="page-shell">
         <button class="trailer-card" type="button" data-open-trailer aria-label="Play DIRECTIVE I teaser">
-          <video class="trailer-preview" autoplay muted loop playsinline preload="metadata" aria-hidden="true" data-trailer-preview>
-            <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
+          <video
+            class="trailer-preview"
+            muted
+            playsinline
+            webkit-playsinline
+            preload="metadata"
+            poster="assets/directive-i-trailer-poster.jpg?v=4"
+            aria-hidden="true"
+            data-trailer-preview>
+            <source src="assets/directive-i-transmission-001.mp4?v=4" type="video/mp4" />
           </video>
           <span class="trailer-shade" aria-hidden="true"></span>
           <span class="trailer-ui">
@@ -213,12 +239,12 @@
         <div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div>
         <button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button>
       </div>
-      <video controls playsinline preload="auto" data-modal-video>
-        <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
+      <video controls playsinline webkit-playsinline preload="auto" data-modal-video>
+        <source src="assets/directive-i-transmission-001.mp4?v=4" type="video/mp4" />
       </video>
     </div>
   </dialog>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
