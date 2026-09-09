@@ -10,187 +10,56 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="hero-effects.css?v=2" />
   <style>
-    .hero-video {
-      z-index: 0 !important;
-      filter: none !important;
-      transform: none !important;
-      object-fit: cover !important;
-      object-position: center center !important;
-      image-rendering: auto;
-      background: #050606;
-      pointer-events: none;
-    }
-    .hero-vignette {
-      z-index: 1 !important;
-      background:
-        linear-gradient(90deg, rgba(4,6,6,.56) 0%, rgba(4,6,6,.30) 36%, rgba(4,6,6,.04) 70%, rgba(4,6,6,.08) 100%),
-        linear-gradient(0deg, rgba(7,9,9,.80) 0%, rgba(7,9,9,.08) 34%, rgba(7,9,9,.04) 74%, rgba(7,9,9,.12) 100%) !important;
-    }
-    .hero-grid { z-index: 2 !important; }
-    .hero-content { position: relative; z-index: 3; }
-    .scroll-cue { z-index: 3; }
-    .hero-copy { text-shadow: 0 2px 28px rgba(0,0,0,.62); }
-
-    @media (max-width: 900px) {
-      .hero-video { object-position: center center !important; }
-      .hero-vignette {
-        background:
-          linear-gradient(90deg, rgba(4,6,6,.40) 0%, rgba(4,6,6,.17) 58%, rgba(4,6,6,.03) 100%),
-          linear-gradient(0deg, rgba(7,9,9,.82) 0%, rgba(7,9,9,.10) 42%, rgba(7,9,9,.06) 100%) !important;
-      }
-    }
-
-    @media (max-width: 620px) {
-      .hero-vignette {
-        background:
-          linear-gradient(0deg, rgba(7,9,9,.83) 0%, rgba(7,9,9,.29) 31%, rgba(7,9,9,.04) 66%, rgba(7,9,9,.08) 100%) !important;
-      }
-      .hero-copy { text-shadow: 0 2px 24px rgba(0,0,0,.70); }
-      .hero-meta { background: rgba(5,7,7,.46); }
-    }
+    .hero-video {z-index:0!important;filter:none!important;transform:none!important;object-fit:cover!important;object-position:center center!important;image-rendering:auto;background:#050606;pointer-events:none}
+    .hero-vignette {z-index:1!important;background:linear-gradient(90deg,rgba(4,6,6,.56) 0%,rgba(4,6,6,.30) 36%,rgba(4,6,6,.04) 70%,rgba(4,6,6,.08) 100%),linear-gradient(0deg,rgba(7,9,9,.80) 0%,rgba(7,9,9,.08) 34%,rgba(7,9,9,.04) 74%,rgba(7,9,9,.12) 100%)!important}
+    .hero-grid{z-index:2!important}.hero-content{position:relative;z-index:3}.scroll-cue{z-index:3}.hero-copy{text-shadow:0 2px 28px rgba(0,0,0,.62)}
+    @media(max-width:900px){.hero-video{object-position:center center!important}.hero-vignette{background:linear-gradient(90deg,rgba(4,6,6,.40) 0%,rgba(4,6,6,.17) 58%,rgba(4,6,6,.03) 100%),linear-gradient(0deg,rgba(7,9,9,.82) 0%,rgba(7,9,9,.10) 42%,rgba(7,9,9,.06) 100%)!important}}
+    @media(max-width:620px){.hero-vignette{background:linear-gradient(0deg,rgba(7,9,9,.83) 0%,rgba(7,9,9,.29) 31%,rgba(7,9,9,.04) 66%,rgba(7,9,9,.08) 100%)!important}.hero-copy{text-shadow:0 2px 24px rgba(0,0,0,.70)}.hero-meta{background:rgba(5,7,7,.46)}}
   </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-
   <header class="site-header" data-header>
-    <a class="brand" href="#top" aria-label="DIRECTIVE I home">
-      <span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span>
-    </a>
-
-    <nav class="desktop-nav" aria-label="Primary navigation">
-      <a href="#overview">Overview</a>
-      <a href="story.html">Main Story</a>
-      <a href="#trailer">Trailer</a>
-      <a href="#systems">Systems</a>
-      <a href="#intel">Intel</a>
-    </nav>
-
-    <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" data-menu-button>
-      <span></span><span></span>
-    </button>
+    <a class="brand" href="#top" aria-label="DIRECTIVE I home"><span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span></a>
+    <nav class="desktop-nav" aria-label="Primary navigation"><a href="#overview">Overview</a><a href="story.html">Main Story</a><a href="#trailer">Trailer</a><a href="#systems">Systems</a><a href="#intel">Intel</a></nav>
+    <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" data-menu-button><span></span><span></span></button>
   </header>
-
-  <div class="mobile-menu" data-mobile-menu aria-hidden="true">
-    <nav aria-label="Mobile navigation">
-      <a href="#overview">Overview</a>
-      <a href="story.html">Main Story</a>
-      <a href="#trailer">Trailer</a>
-      <a href="#systems">Systems</a>
-      <a href="#intel">Intel</a>
-    </nav>
-  </div>
+  <div class="mobile-menu" data-mobile-menu aria-hidden="true"><nav aria-label="Mobile navigation"><a href="#overview">Overview</a><a href="story.html">Main Story</a><a href="#trailer">Trailer</a><a href="#systems">Systems</a><a href="#intel">Intel</a></nav></div>
 
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <video
-        class="hero-video"
-        autoplay
-        muted
-        loop
-        playsinline
-        webkit-playsinline
-        preload="auto"
-        poster="assets/directive-i-hero-poster.jpg?v=5"
-        disablepictureinpicture
-        x-webkit-airplay="deny"
-        aria-hidden="true"
-        data-hero-video>
-        <source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" />
-      </video>
-      <div class="hero-vignette" aria-hidden="true"></div>
-      <div class="hero-grid" aria-hidden="true"></div>
-
+      <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/directive-i-hero-poster.jpg?v=5" disablepictureinpicture x-webkit-airplay="deny" aria-hidden="true" data-hero-video><source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" /></video>
+      <div class="hero-vignette" aria-hidden="true"></div><div class="hero-grid" aria-hidden="true"></div>
       <div class="hero-content page-shell">
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> Season I / Directive active</p>
-          <h1 id="hero-title"><span>DIRECTIVE</span><strong>I</strong></h1>
-          <p class="hero-subtitle">Minecraft Zombie Apocalypse Modpack</p>
-          <p class="hero-description">A dark survival experience built around tactical combat, infected threats, scavenging, and a world that no longer feels safe.</p>
-
-          <div class="hero-actions">
-            <button class="button button-primary" type="button" data-open-trailer>
-              <span class="play-triangle" aria-hidden="true"></span>
-              Watch teaser
-            </button>
-            <a class="button button-ghost" href="#overview">Enter the directive</a>
-          </div>
+          <p class="eyebrow"><span></span> Season I / Directive active</p><h1 id="hero-title"><span>DIRECTIVE</span><strong>I</strong></h1><p class="hero-subtitle">Minecraft Zombie Apocalypse Modpack</p><p class="hero-description">A dark survival experience built around tactical combat, infected threats, scavenging, and a world that no longer feels safe.</p>
+          <div class="hero-actions"><button class="button button-primary" type="button" data-open-trailer><span class="play-triangle" aria-hidden="true"></span>Watch teaser</button><a class="button button-ghost" href="#overview">Enter the directive</a></div>
         </div>
-
-        <div class="hero-meta" aria-label="Project information">
-          <div><span>Platform</span><strong>Minecraft Bedrock</strong></div>
-          <div><span>Genre</span><strong>Zombie Survival</strong></div>
-          <div><span>Campaign</span><strong>Season I</strong></div>
-        </div>
+        <div class="hero-meta" aria-label="Project information"><div><span>Platform</span><strong>Minecraft Bedrock</strong></div><div><span>Genre</span><strong>Zombie Survival</strong></div><div><span>Campaign</span><strong>Season I</strong></div></div>
       </div>
-
-      <a class="scroll-cue" href="#overview" aria-label="Scroll to overview">
-        <span>Scroll to survive</span><i></i>
-      </a>
+      <a class="scroll-cue" href="#overview" aria-label="Scroll to overview"><span>Scroll to survive</span><i></i></a>
     </section>
 
     <section class="section overview-section" id="overview">
-      <div class="page-shell two-column">
-        <div class="section-heading">
-          <p class="kicker">01 / THE DIRECTIVE</p>
-          <h2>The city fell.<br />The mission did not.</h2>
-        </div>
-        <div class="section-copy">
-          <p>DIRECTIVE I is designed as a focused, cinematic apocalypse experience: tactical encounters, hostile infected, scarce resources, and weapons that feel distinct instead of interchangeable.</p>
-          <p class="muted">The presentation stays minimal and grounded—closer to a modern AAA military survival title than a crowded Minecraft mod page.</p>
-        </div>
-      </div>
-
-      <div class="page-shell feature-strip" aria-label="Core pillars">
-        <article><span>01</span><h3>Survive</h3><p>Read the environment. Pick your fights. Keep moving.</p></article>
-        <article><span>02</span><h3>Adapt</h3><p>Build a loadout around recoil, handling, range, and attachments.</p></article>
-        <article><span>03</span><h3>Engage</h3><p>Tactical gunplay against infected threats in close, dangerous spaces.</p></article>
-        <article><span>04</span><h3>Extract</h3><p>Scavenge what matters and make it out before the city closes in.</p></article>
-      </div>
+      <div class="page-shell two-column"><div class="section-heading"><p class="kicker">01 / THE DIRECTIVE</p><h2>The city fell.<br />The mission did not.</h2></div><div class="section-copy"><p>DIRECTIVE I is designed as a focused, cinematic apocalypse experience: tactical encounters, hostile infected, scarce resources, and weapons that feel distinct instead of interchangeable.</p><p class="muted">The presentation stays minimal and grounded—closer to a modern AAA military survival title than a crowded Minecraft mod page.</p></div></div>
+      <div class="page-shell feature-strip" aria-label="Core pillars"><article><span>01</span><h3>Survive</h3><p>Read the environment. Pick your fights. Keep moving.</p></article><article><span>02</span><h3>Adapt</h3><p>Build a loadout around recoil, handling, range, and attachments.</p></article><article><span>03</span><h3>Engage</h3><p>Tactical gunplay against infected threats in close, dangerous spaces.</p></article><article><span>04</span><h3>Extract</h3><p>Scavenge what matters and make it out before the city closes in.</p></article></div>
     </section>
 
     <section class="section trailer-section" id="trailer" aria-labelledby="trailer-title">
-      <div class="page-shell trailer-heading">
-        <div>
-          <p class="kicker">02 / OFFICIAL TRAILER</p>
-          <h2 id="trailer-title">Transmission 001</h2>
-        </div>
-        <p>10-second cinematic teaser · 16:9 · Season I</p>
-      </div>
-
-      <div class="page-shell">
-        <button class="trailer-card" type="button" data-open-trailer aria-label="Play DIRECTIVE I teaser">
-          <video class="trailer-preview" muted playsinline webkit-playsinline preload="metadata" poster="assets/directive-i-trailer-poster.jpg?v=5" aria-hidden="true" data-trailer-preview>
-            <source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" />
-            <source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" />
-          </video>
-          <span class="trailer-shade" aria-hidden="true"></span>
-          <span class="trailer-ui"><span class="trailer-play"><i class="play-triangle"></i></span><span class="trailer-label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span><span class="trailer-time">00:10</span></span>
-        </button>
-      </div>
+      <div class="page-shell trailer-heading"><div><p class="kicker">02 / OFFICIAL TRAILER</p><h2 id="trailer-title">Transmission 001</h2></div><p>10-second cinematic teaser · 16:9 · Season I</p></div>
+      <div class="page-shell"><button class="trailer-card" type="button" data-open-trailer aria-label="Play DIRECTIVE I teaser"><video class="trailer-preview" muted playsinline webkit-playsinline preload="metadata" poster="assets/directive-i-trailer-poster.jpg?v=5" aria-hidden="true" data-trailer-preview><source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" /><source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" /></video><span class="trailer-shade" aria-hidden="true"></span><span class="trailer-ui"><span class="trailer-play"><i class="play-triangle"></i></span><span class="trailer-label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span><span class="trailer-time">00:10</span></span></button></div>
     </section>
 
-    <section class="section systems-section" id="systems">
-      <div class="page-shell">
-        <div class="section-heading systems-heading"><p class="kicker">03 / CORE SYSTEMS</p><h2>Designed for consequence.</h2><p>Every system supports the same goal: make each encounter feel readable, deliberate, and dangerous.</p></div>
-        <div class="systems-grid">
-          <article class="system-card"><span class="system-index">01</span><div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define how each firearm performs.</p></div></article>
-          <article class="system-card"><span class="system-index">02</span><div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of purely cosmetic.</p></div></article>
-          <article class="system-card"><span class="system-index">03</span><div><h3>Infected pressure</h3><p>Encounters are staged around threat, visibility, sound, and limited breathing room.</p></div></article>
-          <article class="system-card"><span class="system-index">04</span><div><h3>Dark-world atmosphere</h3><p>Minimal UI, controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div></article>
-        </div>
-      </div>
-    </section>
-
+    <section class="section systems-section" id="systems"><div class="page-shell"><div class="section-heading systems-heading"><p class="kicker">03 / CORE SYSTEMS</p><h2>Designed for consequence.</h2><p>Every system supports the same goal: make each encounter feel readable, deliberate, and dangerous.</p></div><div class="systems-grid"><article class="system-card"><span class="system-index">01</span><div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define how each firearm performs.</p></div></article><article class="system-card"><span class="system-index">02</span><div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of purely cosmetic.</p></div></article><article class="system-card"><span class="system-index">03</span><div><h3>Infected pressure</h3><p>Encounters are staged around threat, visibility, sound, and limited breathing room.</p></div></article><article class="system-card"><span class="system-index">04</span><div><h3>Dark-world atmosphere</h3><p>Minimal UI, controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div></article></div></div></section>
     <section class="section intel-section" id="intel"><div class="page-shell intel-card"><div><p class="kicker">04 / FIELD INTEL</p><h2>Season I is only the beginning.</h2></div><div class="intel-copy"><p>New trailer segments can be added to this site one by one as the campaign grows. The media section is already structured for a longer final trailer.</p><button class="text-link" type="button" data-open-trailer>Replay transmission <span>↗</span></button></div></div></section>
   </main>
 
   <footer class="site-footer"><div class="page-shell footer-grid"><a class="brand footer-brand" href="#top" aria-label="DIRECTIVE I home"><span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span></a><p>Minecraft Zombie Apocalypse Modpack · Season I</p><p class="footer-note">Unofficial fan-made Minecraft project. Not affiliated with Mojang or Microsoft.</p></div></footer>
-
   <dialog class="trailer-modal" data-trailer-modal aria-labelledby="modal-title"><div class="modal-frame"><div class="modal-topbar"><div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div><button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button></div><video controls playsinline webkit-playsinline preload="auto" data-modal-video><source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" /><source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" /></video></div></dialog>
 
   <script src="script.js?v=8"></script>
   <script src="profile-logout.js?v=3"></script>
   <script src="scroll-effects.js?v=1"></script>
+  <script src="music-player.js?v=1"></script>
 </body>
 </html>
