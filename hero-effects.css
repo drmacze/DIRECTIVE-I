@@ -1,4 +1,4 @@
-/* DIRECTIVE I — cinematic hero micro-interactions */
+/* DIRECTIVE I — cinematic hero and scroll micro-interactions */
 
 /* Hero description typing cursor */
 .hero-description {
@@ -28,82 +28,170 @@
   47%, 100% { opacity: 0; }
 }
 
-/* Header logo shine — intentionally scoped to the top-left header brand only. */
+/*
+  Header logo finish: the specular highlight now lives INSIDE the glyphs.
+  No rectangular overlay, no clipping outside the wordmark.
+*/
 .site-header > .brand {
   position: relative;
-  overflow: hidden;
   isolation: isolate;
-  padding: 4px 2px 5px 0;
-}
-
-.site-header > .brand::after {
-  content: "";
-  position: absolute;
-  z-index: 3;
-  top: -55%;
-  bottom: -55%;
-  left: -48%;
-  width: 24%;
-  pointer-events: none;
-  opacity: 0;
-  transform: skewX(-18deg);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, .12) 24%,
-    rgba(255, 255, 255, .95) 50%,
-    rgba(191, 255, 145, .42) 67%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  filter: blur(.35px);
-  mix-blend-mode: screen;
-  animation: directive-logo-shine 5.4s cubic-bezier(.2, .72, .22, 1) infinite;
+  overflow: visible;
+  padding: 4px 1px 5px 0;
 }
 
 .site-header > .brand .brand-word,
 .site-header > .brand .brand-mark {
   position: relative;
-  z-index: 1;
+  display: inline-block;
+  transform: translateZ(0);
 }
 
 .site-header > .brand .brand-word {
-  text-shadow: 0 0 20px rgba(255, 255, 255, .045);
+  color: #f2f3f2;
+  text-shadow: 0 0 16px rgba(255, 255, 255, .035);
 }
 
 .site-header > .brand .brand-mark {
-  animation: directive-mark-glow 5.4s ease-in-out infinite;
+  color: var(--green);
+  text-shadow: 0 0 13px rgba(112, 226, 36, .22);
 }
 
-@keyframes directive-logo-shine {
-  0%, 62% { left: -48%; opacity: 0; }
-  66% { opacity: .9; }
-  78% { left: 126%; opacity: .95; }
-  82%, 100% { left: 126%; opacity: 0; }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .site-header > .brand .brand-word {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+      108deg,
+      #eef1ee 0%,
+      #eef1ee 38%,
+      #ffffff 45%,
+      #dfffd2 49%,
+      #ffffff 52%,
+      #eef1ee 59%,
+      #eef1ee 100%
+    );
+    background-size: 310% 100%;
+    background-position: 100% 0;
+    animation: directive-word-specular 7.2s cubic-bezier(.22, .7, .2, 1) infinite;
+  }
+
+  .site-header > .brand .brand-mark {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+      108deg,
+      #70e224 0%,
+      #70e224 38%,
+      #c8ff9e 47%,
+      #ffffff 50%,
+      #a4ff62 54%,
+      #70e224 61%,
+      #70e224 100%
+    );
+    background-size: 310% 100%;
+    background-position: 100% 0;
+    animation: directive-mark-specular 7.2s cubic-bezier(.22, .7, .2, 1) infinite;
+  }
 }
 
-@keyframes directive-mark-glow {
-  0%, 62%, 100% {
-    text-shadow: 0 0 12px rgba(112, 226, 36, .26);
+@keyframes directive-word-specular {
+  0%, 56% { background-position: 100% 0; }
+  74% { background-position: 0% 0; }
+  100% { background-position: 0% 0; }
+}
+
+@keyframes directive-mark-specular {
+  0%, 58% {
+    background-position: 100% 0;
+    filter: brightness(1);
+    text-shadow: 0 0 13px rgba(112, 226, 36, .22);
   }
-  76% {
-    text-shadow: 0 0 8px rgba(183, 255, 132, .8), 0 0 24px rgba(112, 226, 36, .58);
+  72% {
+    filter: brightness(1.14);
+    text-shadow: 0 0 10px rgba(196, 255, 151, .48), 0 0 23px rgba(112, 226, 36, .28);
   }
+  76%, 100% {
+    background-position: 0% 0;
+    filter: brightness(1);
+    text-shadow: 0 0 13px rgba(112, 226, 36, .22);
+  }
+}
+
+/* Cinematic scroll-trigger system. Hidden states only apply after JS is ready. */
+body.scroll-fx-ready [data-scroll-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0) scale(.992);
+  filter: blur(6px);
+  transition:
+    opacity .92s cubic-bezier(.2, .7, .18, 1),
+    transform 1.12s cubic-bezier(.16, 1, .3, 1),
+    filter .88s cubic-bezier(.2, .7, .18, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity, filter;
+}
+
+body.scroll-fx-ready [data-scroll-reveal="heading"] {
+  transform: translate3d(0, 42px, 0) scale(.985);
+}
+
+body.scroll-fx-ready [data-scroll-reveal="card"] {
+  transform: translate3d(0, 28px, 0) scale(.978);
+}
+
+body.scroll-fx-ready [data-scroll-reveal].is-scroll-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+/* Very subtle section edge response while elements enter view. */
+body.scroll-fx-ready .section {
+  --section-light: 0;
+}
+
+.scroll-cue i {
+  transform-origin: left center;
+  animation: directive-scroll-pulse 2.4s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+
+@keyframes directive-scroll-pulse {
+  0%, 100% { transform: scaleX(.45); opacity: .42; }
+  48% { transform: scaleX(1); opacity: 1; }
 }
 
 @media (max-width: 620px) {
   .hero-description { min-height: 5.2em; }
-  .site-header > .brand::after { width: 30%; }
+
+  body.scroll-fx-ready [data-scroll-reveal] {
+    transform: translate3d(0, 24px, 0) scale(.994);
+    filter: blur(4px);
+    transition-duration: .82s, .98s, .78s;
+  }
+
+  body.scroll-fx-ready [data-scroll-reveal].is-scroll-visible {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-description.is-typing::after,
-  .hero-description.is-typed::after {
-    animation: none;
-    opacity: 0;
+  .hero-description.is-typed::after,
+  .site-header > .brand .brand-word,
+  .site-header > .brand .brand-mark,
+  .scroll-cue i {
+    animation: none !important;
   }
 
-  .site-header > .brand::after,
-  .site-header > .brand .brand-mark {
-    animation: none;
+  body.scroll-fx-ready [data-scroll-reveal],
+  body.scroll-fx-ready [data-scroll-reveal].is-scroll-visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
   }
 }
