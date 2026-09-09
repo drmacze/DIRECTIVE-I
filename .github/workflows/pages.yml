@@ -24,8 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare static site
-        run: touch .nojekyll
+      - name: Prepare cinematic media
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          cat assets/transmission-v2-b64/part-* | tr -d '\n\r ' | base64 --decode > assets/directive-i-transmission-001.mp4
+          test -s assets/directive-i-transmission-001.mp4
+          rm -rf assets/transmission-v2-b64 assets/transmission-001-b64 assets/trailer-b64
+          touch .nojekyll
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
