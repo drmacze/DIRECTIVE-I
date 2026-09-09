@@ -55,7 +55,7 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.setTimeout(() => {
       clearDirectiveSession();
-      window.location.replace('welcome.html?logout=1');
+      window.location.replace('welcome.html?logout=1&v=58');
     }, reduced ? 30 : 920);
   }
 
