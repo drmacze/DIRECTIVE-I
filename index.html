@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="hero-effects.css?v=2" />
   <style>
-    /* iOS-safe cinematic compositing: keep video in the normal positive z-stack.
-       Negative-z video layers can visually freeze in some WKWebView/Safari paths. */
     .hero-video {
       z-index: 0 !important;
       filter: none !important;
@@ -192,6 +190,7 @@
   <dialog class="trailer-modal" data-trailer-modal aria-labelledby="modal-title"><div class="modal-frame"><div class="modal-topbar"><div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div><button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button></div><video controls playsinline webkit-playsinline preload="auto" data-modal-video><source src="assets/directive-i-transmission-001.mp4?v=5" type="video/mp4" /><source src="assets/directive-i-hero-1080.mp4?v=5" type="video/mp4" /></video></div></dialog>
 
   <script src="script.js?v=7"></script>
+  <script src="profile-logout.js?v=2"></script>
   <script src="scroll-effects.js?v=1"></script>
 </body>
 </html>
