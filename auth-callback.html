@@ -18,30 +18,73 @@
 <body>
   <main class="card">
     <div class="brand"><span>DIRECTIVE</span><b>I</b></div>
-    <div class="status" data-status><span class="spinner"></span>Authentication endpoint active</div>
+    <div class="status" data-status><span class="spinner"></span>Validating Microsoft response</div>
     <div class="copy">
-      <h1 data-title>Microsoft callback ready.</h1>
-      <p data-copy>This secure return URL is now available for the DIRECTIVE I Microsoft/Xbox sign-in flow.</p>
+      <h1 data-title>Securing Xbox identity.</h1>
+      <p data-copy>DIRECTIVE I is exchanging the Microsoft authorization response through the secure backend. Your Microsoft password never passes through this page.</p>
     </div>
-    <div class="actions"><a href="welcome.html">Return to secure access</a></div>
+    <div class="actions"><a href="welcome.html" data-return hidden>Return to secure access</a></div>
   </main>
   <script>
     (()=>{
+      const BACKEND='https://ydaeukhqwishlrjyfktk.supabase.co/functions/v1/minecraft-auth';
       const p=new URLSearchParams(location.search);
       const title=document.querySelector('[data-title]');
       const copy=document.querySelector('[data-copy]');
       const status=document.querySelector('[data-status]');
-      if(p.has('error')){
+      const returnLink=document.querySelector('[data-return]');
+
+      const fail=(heading,message)=>{
         status.textContent='Authentication was not completed';
-        title.textContent='Microsoft sign-in cancelled.';
-        copy.textContent=p.get('error_description')||'The Microsoft authorization request did not complete. Return to DIRECTIVE I and try again.';
+        title.textContent=heading;
+        copy.textContent=message;
+        returnLink.hidden=false;
+      };
+
+      if(p.has('error')){
+        fail('Microsoft sign-in cancelled.',p.get('error_description')||'The Microsoft authorization request did not complete. Return to DIRECTIVE I and try again.');
         return;
       }
-      if(p.has('code')){
-        status.innerHTML='<span class="spinner"></span>Authorization returned';
-        title.textContent='Identity response received.';
-        copy.textContent='Microsoft returned an authorization response successfully. The secure server-side token exchange will be connected next; no account secret is stored on this page.';
+
+      const code=p.get('code')||'';
+      const returnedState=p.get('state')||'';
+      let expectedState='';
+      try{expectedState=sessionStorage.getItem('directive_microsoft_oauth_state')||'';}catch(_){}
+
+      if(!code){
+        status.textContent='Authentication endpoint active';
+        title.textContent='Microsoft callback ready.';
+        copy.textContent='This callback URL is active. Start the sign-in flow from the DIRECTIVE I welcome page.';
+        returnLink.hidden=false;
+        return;
       }
+
+      if(!expectedState||!returnedState||expectedState!==returnedState){
+        fail('Security check failed.','The Microsoft sign-in state did not match this browser session. Return to DIRECTIVE I and start the login again.');
+        return;
+      }
+
+      try{sessionStorage.removeItem('directive_microsoft_oauth_state');}catch(_){}
+
+      fetch(BACKEND,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({code})
+      })
+      .then(async response=>{
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok||!data?.ok||!data?.account){
+          throw new Error(data?.error||`Secure backend returned HTTP ${response.status}.`);
+        }
+        try{sessionStorage.setItem('directive_minecraft_account',JSON.stringify(data.account));}catch(_){}
+        status.textContent='Xbox identity verified';
+        title.textContent=data.account.gamertag?`Welcome, ${data.account.gamertag}.`:'Minecraft identity verified.';
+        copy.textContent='Gamertag and Xbox identity were verified successfully. Returning to DIRECTIVE I secure onboarding…';
+        setTimeout(()=>location.replace('welcome.html?auth=success'),750);
+      })
+      .catch(error=>{
+        fail('Account verification failed.',error?.message||'The secure Minecraft/Xbox authentication backend could not verify this account.');
+      });
     })();
   </script>
 </body>
