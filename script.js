@@ -8,6 +8,66 @@ const trailerPreview = document.querySelector('[data-trailer-preview]');
 const openTrailerButtons = document.querySelectorAll('[data-open-trailer]');
 const closeTrailerButton = document.querySelector('[data-close-trailer]');
 
+const HERO_BACKGROUND_URL = 'https://image-link.edgeone.app/1788957619264-ml7zjo.mp4';
+const HERO_LOCAL_FALLBACK = 'assets/directive-i-transmission-001.mp4';
+
+function installCinematicHeroTuning() {
+  const style = document.createElement('style');
+  style.dataset.directiveHeroTuning = 'true';
+  style.textContent = `
+    .hero-video {
+      object-position: center center !important;
+      filter: saturate(.92) contrast(1.04) brightness(.96) !important;
+      transform: scale(1.005) !important;
+    }
+    .hero-vignette {
+      background:
+        linear-gradient(90deg, rgba(4,6,6,.84) 0%, rgba(4,6,6,.54) 34%, rgba(4,6,6,.12) 66%, rgba(4,6,6,.18) 100%),
+        linear-gradient(0deg, rgba(7,9,9,.74) 0%, rgba(7,9,9,.08) 42%, rgba(7,9,9,.12) 100%) !important;
+    }
+    @media (max-width: 620px) {
+      .hero-video {
+        object-position: center center !important;
+        filter: saturate(.94) contrast(1.03) brightness(.94) !important;
+      }
+      .hero-vignette {
+        background: linear-gradient(0deg,
+          rgba(7,9,9,.88) 0%,
+          rgba(7,9,9,.48) 43%,
+          rgba(7,9,9,.16) 70%,
+          rgba(7,9,9,.08) 100%) !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function loadHighQualityHeroVideo() {
+  if (!heroVideo) return;
+
+  let usingFallback = false;
+  heroVideo.preload = 'auto';
+  heroVideo.muted = true;
+  heroVideo.loop = true;
+  heroVideo.playsInline = true;
+
+  const fallbackToLocal = () => {
+    if (usingFallback) return;
+    usingFallback = true;
+    heroVideo.src = HERO_LOCAL_FALLBACK;
+    heroVideo.load();
+    heroVideo.play().catch(() => {});
+  };
+
+  heroVideo.addEventListener('error', fallbackToLocal, { once: true });
+  heroVideo.src = HERO_BACKGROUND_URL;
+  heroVideo.load();
+  heroVideo.play().catch(() => {});
+}
+
+installCinematicHeroTuning();
+loadHighQualityHeroVideo();
+
 const syncHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
 syncHeader();
 window.addEventListener('scroll', syncHeader, { passive: true });
