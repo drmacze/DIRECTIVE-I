@@ -1,5 +1,5 @@
 (() => {
-  const MUSIC_SRC = 'https://www.dropbox.com/scl/fi/t9hranj8f2zmlgldx0pno/DIRECTIVE-I-S1.mp3?rlkey=zaysqhl0xchcww3dpybeb2vzh&raw=1';
+  const MUSIC_SRC = 'assets/audio/directive-i-s1.mp3?v=1';
   const COVER_SRC = 'https://res.cloudinary.com/vitjnhhb/image/upload/v1788986703/directive-i-season-1-cover.jpg';
   const TITLE = 'Directive I - S1';
   const enabled = (() => { try { return sessionStorage.getItem('directive_music_enabled') === '1'; } catch (_) { return false; } })();
@@ -35,7 +35,6 @@
   document.body.appendChild(wrap);
 
   const audio = new Audio(MUSIC_SRC);
-  audio.crossOrigin = 'anonymous';
   audio.preload = 'auto';
   audio.loop = true;
   audio.volume = .72;
