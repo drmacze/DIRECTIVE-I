@@ -36,6 +36,7 @@
       sessionStorage.removeItem('directive_minecraft_account');
       sessionStorage.removeItem('directive_home_entry');
       sessionStorage.removeItem('directive_microsoft_oauth_state');
+      sessionStorage.removeItem('directive_play_counted_session');
       sessionStorage.setItem(LOGOUT_REVEAL_KEY, '1');
     } catch (_) {}
   }
@@ -55,7 +56,7 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.setTimeout(() => {
       clearDirectiveSession();
-      window.location.replace('welcome.html?logout=1&v=58');
+      window.location.replace('welcome.html?logout=1&v=65');
     }, reduced ? 30 : 920);
   }
 
