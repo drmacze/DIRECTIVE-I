@@ -76,6 +76,7 @@
   const countdown = overlay.querySelector('[data-home-auth-countdown]');
   const countdownBar = overlay.querySelector('[data-home-auth-countdown-bar]');
   const portal = overlay.querySelector('[data-home-auth-portal]');
+  document.body.appendChild(portal);
   let accepted = false;
 
   const text = (selector, value, fallback = '—') => {
