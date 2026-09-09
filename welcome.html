@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="welcome.css?v=1" />
-  <link rel="stylesheet" href="welcome-polish.css?v=1" />
+  <link rel="stylesheet" href="welcome-polish.css?v=2" />
 </head>
 <body>
   <main class="welcome-shell" data-stage="welcome">
@@ -25,7 +25,7 @@
         <p class="welcome-kicker">Secure onboarding protocol</p>
         <h1 id="welcome-title">
           <span class="welcome-title-line"><span>Welcome to</span></span>
-          <span class="welcome-title-line is-accent"><span>Directive I.</span></span>
+          <span class="welcome-title-line is-directive"><span><span class="directive-word">Directive</span> <span class="directive-mark">I.</span></span></span>
         </h1>
         <p class="welcome-copy">Authenticate your Minecraft identity, review field terms, and enter the active Season I network.</p>
 
@@ -90,7 +90,7 @@
           <article><small>Distribution</small><p>Do not remove attribution, impersonate the project, or redistribute restricted files as your own release.</p></article>
         </div>
 
-        <label class="consent-row license-consent">
+        <label class="consent-row license-consent is-visible">
           <input type="checkbox" data-license-check />
           <span class="custom-check"></span>
           <span>I understand the license and copyright conditions.</span>
