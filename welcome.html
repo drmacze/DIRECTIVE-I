@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050707" />
+  <meta name="description" content="DIRECTIVE I secure access and onboarding." />
+  <title>DIRECTIVE I — Secure Access</title>
+  <link rel="stylesheet" href="welcome.css?v=1" />
+</head>
+<body>
+  <main class="welcome-shell" data-stage="welcome">
+    <section class="welcome-stage stage-active" data-stage-panel="welcome" aria-labelledby="welcome-title">
+      <div class="ambient-grid" aria-hidden="true"></div>
+      <div class="welcome-topline">
+        <a class="welcome-brand" href="welcome.html" aria-label="DIRECTIVE I welcome"><span>DIRECTIVE</span><b>I</b></a>
+        <span class="system-state"><i></i> A.P.E.X NETWORK ONLINE</span>
+      </div>
+
+      <div class="welcome-center">
+        <p class="welcome-kicker">Secure onboarding protocol</p>
+        <h1 id="welcome-title">Welcome to<br><span>Directive I.</span></h1>
+        <p class="welcome-copy">Authenticate your access, review field terms, and enter the active Season I network.</p>
+
+        <div class="welcome-stats" aria-label="Access statistics">
+          <article><small>Account logins</small><strong data-login-count>0</strong><em>This device</em></article>
+          <article><small>Lifetime user play</small><strong data-play-count>0</strong><em>This device</em></article>
+          <article><small>Latest Minecraft support</small><strong>26.40</strong><em>Bedrock</em></article>
+        </div>
+      </div>
+
+      <div class="swipe-area">
+        <p>Secure access required</p>
+        <div class="swipe-track" data-swipe-track aria-label="Swipe to start">
+          <span class="swipe-progress" data-swipe-progress></span>
+          <span class="swipe-label" data-swipe-label>Swipe to start</span>
+          <button class="swipe-handle" type="button" data-swipe-handle aria-label="Swipe to start"><span>→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="onboarding-stage" data-stage-panel="terms" aria-labelledby="terms-title" hidden>
+      <div class="stage-header"><span>01 / USER REQUIREMENTS</span><strong>DIRECTIVE I</strong></div>
+      <div class="terms-layout">
+        <div class="terms-heading">
+          <p>Access protocol</p>
+          <h2 id="terms-title">User requirements.</h2>
+          <span>Read the complete document to unlock consent.</span>
+        </div>
+        <div class="terms-reader" data-terms-reader tabindex="0">
+          <article>
+            <h3>Field access conditions</h3>
+            <p>DIRECTIVE I is an unofficial fan-made Minecraft project. Access to this site and its content is provided for personal use, testing, community participation, and project evaluation.</p>
+            <p>You agree not to misrepresent project content as official Mojang or Microsoft material, not to redistribute protected project files under another identity, and not to intentionally interfere with site availability or other users.</p>
+            <h3>Account and access</h3>
+            <p>Keep your own access credentials private. This static preview currently creates only a local browser session and does not transmit or store your password. A production account backend may replace this local access layer later.</p>
+            <h3>Gameplay and content</h3>
+            <p>DIRECTIVE I contains fictional outbreak, military, survival, and combat themes. Features, supported Minecraft versions, balancing, downloads, and campaign content can change as the project develops.</p>
+            <h3>Availability</h3>
+            <p>Project access may be changed, suspended, or updated when required for maintenance, compatibility, security, or content revisions. No uninterrupted availability is guaranteed.</p>
+            <h3>Final acknowledgement</h3>
+            <p>By continuing, you confirm that you have read these conditions and understand that this is an evolving independent project rather than an official Minecraft service.</p>
+            <div class="reader-end" data-reader-end>End of document // consent clearance available</div>
+          </article>
+        </div>
+      </div>
+      <label class="consent-row" data-terms-consent hidden>
+        <input type="checkbox" data-terms-check />
+        <span class="custom-check"></span>
+        <span>I have read and agree to the user requirements.</span>
+      </label>
+    </section>
+
+    <section class="onboarding-stage slide-stage" data-stage-panel="license" aria-labelledby="license-title" hidden>
+      <div class="stage-header"><span>02 / LICENSE & COPYRIGHT</span><strong>A.P.E.X CLEARANCE</strong></div>
+      <div class="license-content">
+        <p class="section-number">02</p>
+        <h2 id="license-title">License.<br>Copyright.<br><span>Clearance.</span></h2>
+        <div class="license-grid">
+          <article><small>Project identity</small><p>DIRECTIVE I branding, original presentation, custom text, and original project assets remain property of their respective project creator unless otherwise stated.</p></article>
+          <article><small>Minecraft rights</small><p>Minecraft, Mojang, Microsoft, and related trademarks belong to their respective owners. This project is not affiliated with or endorsed by them.</p></article>
+          <article><small>Third-party assets</small><p>External assets, libraries, models, sounds, or references remain governed by their own licenses and attribution requirements.</p></article>
+          <article><small>Distribution</small><p>Do not remove attribution, impersonate the project, or redistribute restricted files as your own release.</p></article>
+        </div>
+
+        <label class="consent-row license-consent">
+          <input type="checkbox" data-license-check />
+          <span class="custom-check"></span>
+          <span>I understand the license and copyright conditions.</span>
+        </label>
+
+        <div class="faq-panel" data-faq-panel hidden>
+          <div class="faq-heading"><p>Clearance accepted</p><h3>FAQ</h3></div>
+          <details><summary>Is DIRECTIVE I official Minecraft content?</summary><p>No. It is an independent fan-made project.</p></details>
+          <details><summary>What Minecraft version is currently supported?</summary><p>The current listed support target is Minecraft Bedrock 26.40.</p></details>
+          <details><summary>Does this page store my password?</summary><p>No. This static preview only validates the form locally and never stores the password.</p></details>
+          <details><summary>Can the supported version change?</summary><p>Yes. Compatibility can change as the project is updated.</p></details>
+          <button class="next-button" type="button" data-next-button>Enter Directive I <span>→</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="sheet-backdrop" data-sheet-backdrop hidden></div>
+  <section class="login-sheet" data-login-sheet aria-hidden="true" aria-labelledby="login-title">
+    <div class="sheet-grabber"></div>
+    <div class="sheet-head"><div><small>Secure access</small><h2 id="login-title">Agent login.</h2></div><button type="button" data-close-login aria-label="Close login">×</button></div>
+    <form data-login-form>
+      <label><span>Email / Agent ID</span><input type="text" name="identity" autocomplete="username" required placeholder="agent@apex.net" /></label>
+      <label><span>Access key</span><input type="password" name="password" autocomplete="current-password" required minlength="4" placeholder="••••••••" /></label>
+      <p class="login-note">Preview access is local to this browser. Passwords are never stored.</p>
+      <button class="login-submit" type="submit">Authenticate <span>→</span></button>
+    </form>
+  </section>
+
+  <div class="portal-transition" data-portal-transition aria-hidden="true">
+    <i class="portal-top"></i><i class="portal-right"></i><i class="portal-bottom"></i><i class="portal-left"></i>
+  </div>
+
+  <script src="welcome.js?v=1"></script>
+</body>
+</html>
