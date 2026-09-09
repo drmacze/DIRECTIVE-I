@@ -9,6 +9,7 @@
   const closeLogin = qs('[data-close-login]');
   const minecraftLoginButton = qs('[data-minecraft-login]');
   const termsReader = qs('[data-terms-reader]');
+  const readerEnd = qs('[data-reader-end]');
   const termsConsent = qs('[data-terms-consent]');
   const termsCheck = qs('[data-terms-check]');
   const licenseCheck = qs('[data-license-check]');
@@ -136,6 +137,7 @@
       nextPanel.classList.add('is-active');
       nextPanel.style.opacity = '';
       nextPanel.style.transform = '';
+      if (nextPanel === termsPanel) setTimeout(unlockTermsConsent, 80);
     }));
   }
 
@@ -155,16 +157,28 @@
     }, 520);
   });
 
+  function showTermsConsent() {
+    if (!termsConsent || !termsConsent.hidden) return;
+    termsConsent.hidden = false;
+    requestAnimationFrame(() => termsConsent.classList.add('is-visible'));
+  }
+
   function unlockTermsConsent() {
     if (!termsReader || !termsConsent || !termsConsent.hidden) return;
     const remaining = termsReader.scrollHeight - termsReader.scrollTop - termsReader.clientHeight;
-    if (remaining <= 26) {
-      termsConsent.hidden = false;
-      requestAnimationFrame(() => termsConsent.classList.add('is-visible'));
-    }
+    if (remaining <= 110) showTermsConsent();
   }
 
   termsReader?.addEventListener('scroll', unlockTermsConsent, { passive: true });
+  termsReader?.addEventListener('touchend', unlockTermsConsent, { passive: true });
+
+  if (termsReader && readerEnd && 'IntersectionObserver' in window) {
+    const endObserver = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) showTermsConsent();
+    }, { root: termsReader, threshold: 0.2, rootMargin: '0px 0px 80px 0px' });
+    endObserver.observe(readerEnd);
+  }
+
   setTimeout(unlockTermsConsent, 300);
 
   termsCheck?.addEventListener('change', () => {
