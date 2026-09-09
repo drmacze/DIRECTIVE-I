@@ -29,8 +29,29 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p assets
+
+          # Keep the existing teaser asset for the trailer modal.
           cat assets/transmission-v2-b64/part-* | tr -d '\n\r ' | base64 --decode > assets/directive-i-transmission-001.mp4
           test -s assets/directive-i-transmission-001.mp4
+
+          # Download the supplied cinematic background once during deployment.
+          # Serving it from GitHub Pages avoids cross-origin/CDN playback issues on iOS.
+          curl -fL --retry 5 --retry-delay 2 --connect-timeout 20 --max-time 180 \
+            -A "Mozilla/5.0" \
+            "https://image-link.edgeone.app/1788957619264-ml7zjo.mp4" \
+            -o assets/directive-i-hero.mp4
+          test -s assets/directive-i-hero.mp4
+
+          echo "Hero file size:"
+          ls -lh assets/directive-i-hero.mp4
+          if command -v ffprobe >/dev/null 2>&1; then
+            echo "Hero video metadata:"
+            ffprobe -v error -select_streams v:0 \
+              -show_entries stream=codec_name,width,height,avg_frame_rate,bit_rate \
+              -show_entries format=duration,size,bit_rate \
+              -of default=noprint_wrappers=1 assets/directive-i-hero.mp4 || true
+          fi
+
           rm -rf assets/transmission-v2-b64 assets/transmission-001-b64 assets/trailer-b64
           touch .nojekyll
 
