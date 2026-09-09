@@ -1,5 +1,6 @@
 (() => {
   const qs = (s, root = document) => root.querySelector(s);
+  const STATS_ENDPOINT = 'https://ydaeukhqwishlrjyfktk.supabase.co/functions/v1/directive-stats';
   const root = qs('.welcome-shell');
   const welcomePanel = qs('[data-stage-panel="welcome"]');
   const termsPanel = qs('[data-stage-panel="terms"]');
@@ -24,22 +25,82 @@
   const swipeLabel = qs('[data-swipe-label]');
 
   const storage = {
-    getNumber(key) {
-      try { return Number(localStorage.getItem(key) || 0) || 0; } catch (_) { return 0; }
-    },
-    setNumber(key, value) {
-      try { localStorage.setItem(key, String(value)); } catch (_) {}
-    },
     set(key, value) {
       try { localStorage.setItem(key, value); } catch (_) {}
     }
   };
 
-  function renderStats() {
-    if (loginCount) loginCount.textContent = storage.getNumber('directive_account_logins').toLocaleString();
-    if (playCount) playCount.textContent = storage.getNumber('directive_lifetime_plays').toLocaleString();
+  const numberFormatter = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function formatCount(value) {
+    return numberFormatter.format(Math.max(0, Math.floor(Number(value) || 0)));
   }
-  renderStats();
+
+  function animateCount(element, target, duration = 1250) {
+    if (!element) return;
+    const safeTarget = Math.max(0, Math.floor(Number(target) || 0));
+    const from = Number.isFinite(element._directiveCountValue) ? element._directiveCountValue : 0;
+
+    if (element._directiveCountFrame) cancelAnimationFrame(element._directiveCountFrame);
+
+    if (reducedMotion || from === safeTarget) {
+      element._directiveCountValue = safeTarget;
+      element.textContent = formatCount(safeTarget);
+      return;
+    }
+
+    const started = performance.now();
+    const distance = safeTarget - from;
+    const easeOut = (t) => 1 - Math.pow(1 - t, 4);
+
+    const frame = (now) => {
+      const t = Math.min(1, (now - started) / duration);
+      const value = from + distance * easeOut(t);
+      element._directiveCountValue = value;
+      element.textContent = formatCount(value);
+
+      if (t < 1) {
+        element._directiveCountFrame = requestAnimationFrame(frame);
+      } else {
+        element._directiveCountFrame = 0;
+        element._directiveCountValue = safeTarget;
+        element.textContent = formatCount(safeTarget);
+      }
+    };
+
+    element._directiveCountFrame = requestAnimationFrame(frame);
+  }
+
+  function setNetworkScope(element) {
+    const scope = element?.closest('article')?.querySelector('em');
+    if (scope) scope.textContent = 'Global network';
+  }
+
+  function renderStats(stats, duration = 1250) {
+    const accountLogins = Math.max(10000, Number(stats?.accountLogins) || 10000);
+    const lifetimeUserPlays = Math.max(0, Number(stats?.lifetimeUserPlays) || 0);
+    setNetworkScope(loginCount);
+    setNetworkScope(playCount);
+    animateCount(loginCount, accountLogins, duration);
+    animateCount(playCount, lifetimeUserPlays, duration);
+  }
+
+  async function fetchNetworkStats() {
+    try {
+      const response = await fetch(`${STATS_ENDPOINT}?t=${Date.now()}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-store'
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data?.ok || !data?.stats) return;
+      renderStats(data.stats, 800);
+    } catch (_) {}
+  }
+
+  renderStats({ accountLogins: 10000, lifetimeUserPlays: 1 }, 1400);
+  window.setTimeout(fetchNetworkStats, 180);
 
   function openLogin() {
     backdrop.hidden = false;
@@ -143,8 +204,6 @@
 
   window.addEventListener('directive:minecraft-authenticated', (event) => {
     const account = event.detail || {};
-    const nextLoginCount = storage.getNumber('directive_account_logins') + 1;
-    storage.setNumber('directive_account_logins', nextLoginCount);
     storage.set('directive_local_session', String(Date.now()));
 
     const safeProfile = {
@@ -164,7 +223,7 @@
       sessionStorage.setItem('directive_minecraft_xuid', safeProfile.xuid);
     } catch (_) {}
 
-    renderStats();
+    window.setTimeout(fetchNetworkStats, 220);
     setTimeout(() => {
       closeLoginSheet();
       setTimeout(() => activatePanel(termsPanel, 1), 380);
@@ -215,8 +274,6 @@
   nextButton?.addEventListener('click', () => {
     if (!licenseCheck?.checked) return;
 
-    const plays = storage.getNumber('directive_lifetime_plays') + 1;
-    storage.setNumber('directive_lifetime_plays', plays);
     storage.set('directive_onboarding_complete', '1');
     try { sessionStorage.setItem('directive_home_entry', '1'); } catch (_) {}
 
