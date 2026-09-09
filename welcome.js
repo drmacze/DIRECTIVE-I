@@ -37,7 +37,7 @@
     return numberFormatter.format(Math.max(0, Math.floor(Number(value) || 0)));
   }
 
-  function animateCount(element, target, duration = 1250) {
+  function animateCount(element, target, duration = 5200) {
     if (!element) return;
     const safeTarget = Math.max(0, Math.floor(Number(target) || 0));
     const from = Number.isFinite(element._directiveCountValue) ? element._directiveCountValue : 0;
@@ -52,11 +52,13 @@
 
     const started = performance.now();
     const distance = safeTarget - from;
-    const easeOut = (t) => 1 - Math.pow(1 - t, 4);
+    const easeInOutCubic = (t) => t < .5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     const frame = (now) => {
       const t = Math.min(1, (now - started) / duration);
-      const value = from + distance * easeOut(t);
+      const value = from + distance * easeInOutCubic(t);
       element._directiveCountValue = value;
       element.textContent = formatCount(value);
 
@@ -77,7 +79,7 @@
     if (scope) scope.textContent = 'Global network';
   }
 
-  function renderStats(stats, duration = 1250) {
+  function renderStats(stats, duration = 5200) {
     const accountLogins = Math.max(10000, Number(stats?.accountLogins) || 10000);
     const lifetimeUserPlays = Math.max(0, Number(stats?.lifetimeUserPlays) || 0);
     setNetworkScope(loginCount);
@@ -95,12 +97,12 @@
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data?.ok || !data?.stats) return;
-      renderStats(data.stats, 800);
+      renderStats(data.stats, 5200);
     } catch (_) {}
   }
 
-  renderStats({ accountLogins: 10000, lifetimeUserPlays: 1 }, 1400);
-  window.setTimeout(fetchNetworkStats, 180);
+  renderStats({ accountLogins: 10000, lifetimeUserPlays: 1 }, 5600);
+  window.setTimeout(fetchNetworkStats, 280);
 
   function openLogin() {
     backdrop.hidden = false;
