@@ -284,7 +284,7 @@ function initMinecraftProfile() {
   const chevron = document.createElement('span');
   chevron.className = 'player-profile-chevron';
   chevron.setAttribute('aria-hidden', 'true');
-  chevron.textContent = '⌄';
+  chevron.textContent = '';
 
   button.append(avatar, name, chevron);
   stack.appendChild(button);
@@ -324,7 +324,8 @@ function initMinecraftProfile() {
     .player-profile-avatar{width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(112,226,36,.55);background:#101712;color:#70e224;font-size:8px;font-weight:900;letter-spacing:.04em}
     .player-profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .player-profile-gamertag{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:850;letter-spacing:.06em}
-    .player-profile-chevron{margin-left:auto;color:#70e224;font-size:13px;line-height:1;transition:transform .18s ease}
+    .player-profile-chevron{margin-left:auto;width:16px;height:16px;flex:0 0 16px;display:grid;place-items:center;position:relative;color:#70e224;transition:transform .18s ease}
+    .player-profile-chevron::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-1px) rotate(45deg);transform-origin:center}
     .player-profile-button[aria-expanded="true"] .player-profile-chevron{transform:rotate(180deg)}
     .player-profile-panel{position:absolute;left:0;top:calc(100% + 8px);width:220px;padding:16px;border:1px solid rgba(255,255,255,.14);background:rgba(5,8,7,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 18px 45px rgba(0,0,0,.35);opacity:0;transform:translateY(-5px);transition:opacity .16s ease,transform .16s ease}
     .player-profile-panel.is-open{opacity:1;transform:none}
@@ -338,6 +339,32 @@ function initMinecraftProfile() {
   document.documentElement.style.setProperty('--header-h', '96px');
 }
 
+async function trackLifetimePlay() {
+  const STATS_ENDPOINT = 'https://ydaeukhqwishlrjyfktk.supabase.co/functions/v1/directive-stats';
+  let hasProfile = false;
+  let counted = false;
+
+  try {
+    const profile = JSON.parse(localStorage.getItem('directive_minecraft_profile') || 'null');
+    hasProfile = Boolean(profile?.gamertag && profile?.authenticated !== false);
+    counted = sessionStorage.getItem('directive_play_counted_session') === '1';
+  } catch (_) {}
+
+  if (!hasProfile || counted) return;
+
+  try {
+    const response = await fetch(STATS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'play' }),
+      cache: 'no-store'
+    });
+    if (!response.ok) return;
+    try { sessionStorage.setItem('directive_play_counted_session', '1'); } catch (_) {}
+  } catch (_) {}
+}
+
 initMinecraftProfile();
+trackLifetimePlay();
 
 import('./cookie.js?v=1').catch(() => {});
