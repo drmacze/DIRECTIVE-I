@@ -1,0 +1,109 @@
+/* DIRECTIVE I — cinematic hero micro-interactions */
+
+/* Hero description typing cursor */
+.hero-description {
+  position: relative;
+  min-height: 3.5em;
+}
+
+.hero-description.is-typing::after,
+.hero-description.is-typed::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: .92em;
+  margin-left: .16em;
+  vertical-align: -.08em;
+  background: var(--green);
+  box-shadow: 0 0 10px rgba(112, 226, 36, .72), 0 0 24px rgba(112, 226, 36, .24);
+  animation: directive-caret .78s steps(1, end) infinite;
+}
+
+.hero-description.is-typing {
+  text-shadow: 0 0 22px rgba(255, 255, 255, .025);
+}
+
+@keyframes directive-caret {
+  0%, 46% { opacity: 1; }
+  47%, 100% { opacity: 0; }
+}
+
+/* Header logo shine — intentionally scoped to the top-left header brand only. */
+.site-header > .brand {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 4px 2px 5px 0;
+}
+
+.site-header > .brand::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: -55%;
+  bottom: -55%;
+  left: -48%;
+  width: 24%;
+  pointer-events: none;
+  opacity: 0;
+  transform: skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, .12) 24%,
+    rgba(255, 255, 255, .95) 50%,
+    rgba(191, 255, 145, .42) 67%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(.35px);
+  mix-blend-mode: screen;
+  animation: directive-logo-shine 5.4s cubic-bezier(.2, .72, .22, 1) infinite;
+}
+
+.site-header > .brand .brand-word,
+.site-header > .brand .brand-mark {
+  position: relative;
+  z-index: 1;
+}
+
+.site-header > .brand .brand-word {
+  text-shadow: 0 0 20px rgba(255, 255, 255, .045);
+}
+
+.site-header > .brand .brand-mark {
+  animation: directive-mark-glow 5.4s ease-in-out infinite;
+}
+
+@keyframes directive-logo-shine {
+  0%, 62% { left: -48%; opacity: 0; }
+  66% { opacity: .9; }
+  78% { left: 126%; opacity: .95; }
+  82%, 100% { left: 126%; opacity: 0; }
+}
+
+@keyframes directive-mark-glow {
+  0%, 62%, 100% {
+    text-shadow: 0 0 12px rgba(112, 226, 36, .26);
+  }
+  76% {
+    text-shadow: 0 0 8px rgba(183, 255, 132, .8), 0 0 24px rgba(112, 226, 36, .58);
+  }
+}
+
+@media (max-width: 620px) {
+  .hero-description { min-height: 5.2em; }
+  .site-header > .brand::after { width: 30%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-description.is-typing::after,
+  .hero-description.is-typed::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .site-header > .brand::after,
+  .site-header > .brand .brand-mark {
+    animation: none;
+  }
+}
