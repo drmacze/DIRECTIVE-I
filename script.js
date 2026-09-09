@@ -8,7 +8,7 @@ const trailerPreview = document.querySelector('[data-trailer-preview]');
 const openTrailerButtons = document.querySelectorAll('[data-open-trailer]');
 const closeTrailerButton = document.querySelector('[data-close-trailer]');
 
-const HERO_BACKGROUND_URL = 'assets/directive-i-hero.mp4';
+const HERO_BACKGROUND_URL = 'https://image-link.edgeone.app/1788957619264-ml7zjo.mp4';
 const HERO_FALLBACK_URL = 'assets/directive-i-transmission-001.mp4';
 
 const syncHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
@@ -68,19 +68,16 @@ function recoverHero(delay = 250) {
   window.clearTimeout(heroRecoveryTimer);
   heroRecoveryTimer = window.setTimeout(() => {
     if (!heroCanPlay() || !heroVideo) return;
-
     if (heroVideo.ended || (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0 && heroVideo.currentTime >= heroVideo.duration - 0.12)) {
       resumeHero(true);
       return;
     }
-
     if (heroVideo.paused) resumeHero(false);
   }, delay);
 }
 
 if (heroVideo) {
   configureHeroVideo();
-
   heroVideo.addEventListener('loadedmetadata', () => resumeHero(false));
   heroVideo.addEventListener('canplay', () => resumeHero(false));
   heroVideo.addEventListener('ended', () => resumeHero(true));
@@ -98,8 +95,6 @@ if (heroVideo) {
     resumeHero(false);
   });
 
-  // iOS may suspend muted video after a navigation/UI interruption.
-  // Restore playback whenever the page becomes active again.
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !modal?.open) resumeHero(false);
   });
