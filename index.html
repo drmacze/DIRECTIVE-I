@@ -7,6 +7,38 @@
   <meta name="description" content="DIRECTIVE I — a cinematic Minecraft zombie apocalypse modpack." />
   <title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Hero clarity pass: preserve the source image instead of crushing it with filters. */
+    .hero-video {
+      filter: none !important;
+      transform: none !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      image-rendering: auto;
+      background: #050606;
+    }
+    .hero-vignette {
+      background:
+        linear-gradient(90deg, rgba(4,6,6,.74) 0%, rgba(4,6,6,.48) 34%, rgba(4,6,6,.10) 68%, rgba(4,6,6,.16) 100%),
+        linear-gradient(0deg, rgba(7,9,9,.92) 0%, rgba(7,9,9,.10) 32%, rgba(7,9,9,.08) 72%, rgba(7,9,9,.22) 100%) !important;
+    }
+    @media (max-width: 900px) {
+      .hero-video { object-position: center center !important; }
+      .hero-vignette {
+        background:
+          linear-gradient(90deg, rgba(4,6,6,.56) 0%, rgba(4,6,6,.25) 58%, rgba(4,6,6,.08) 100%),
+          linear-gradient(0deg, rgba(7,9,9,.92) 0%, rgba(7,9,9,.15) 42%, rgba(7,9,9,.12) 100%) !important;
+      }
+    }
+    @media (max-width: 620px) {
+      .hero-vignette {
+        background:
+          linear-gradient(0deg, rgba(7,9,9,.94) 0%, rgba(7,9,9,.48) 31%, rgba(7,9,9,.10) 66%, rgba(7,9,9,.16) 100%) !important;
+      }
+      .hero-copy { text-shadow: 0 2px 22px rgba(0,0,0,.72); }
+      .hero-meta { background: rgba(5,7,7,.58); }
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -39,7 +71,8 @@
 
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" data-hero-video>
+      <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true" data-hero-video>
+        <source src="https://image-link.edgeone.app/1788957619264-ml7zjo.mp4" type="video/mp4" />
         <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
       </video>
       <div class="hero-vignette" aria-hidden="true"></div>
