@@ -8,35 +8,39 @@
   <title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Hero clarity pass: preserve the source image instead of crushing it with filters. */
+    /* Cinematic hero clarity pass: preserve the source and keep overlays light. */
     .hero-video {
       filter: none !important;
       transform: none !important;
       object-fit: cover !important;
       object-position: center center !important;
       image-rendering: auto;
+      backface-visibility: hidden;
       background: #050606;
     }
     .hero-vignette {
       background:
-        linear-gradient(90deg, rgba(4,6,6,.74) 0%, rgba(4,6,6,.48) 34%, rgba(4,6,6,.10) 68%, rgba(4,6,6,.16) 100%),
-        linear-gradient(0deg, rgba(7,9,9,.92) 0%, rgba(7,9,9,.10) 32%, rgba(7,9,9,.08) 72%, rgba(7,9,9,.22) 100%) !important;
+        linear-gradient(90deg, rgba(4,6,6,.60) 0%, rgba(4,6,6,.34) 36%, rgba(4,6,6,.06) 70%, rgba(4,6,6,.10) 100%),
+        linear-gradient(0deg, rgba(7,9,9,.84) 0%, rgba(7,9,9,.10) 34%, rgba(7,9,9,.05) 74%, rgba(7,9,9,.14) 100%) !important;
+    }
+    .hero-copy {
+      text-shadow: 0 2px 28px rgba(0,0,0,.60);
     }
     @media (max-width: 900px) {
       .hero-video { object-position: center center !important; }
       .hero-vignette {
         background:
-          linear-gradient(90deg, rgba(4,6,6,.56) 0%, rgba(4,6,6,.25) 58%, rgba(4,6,6,.08) 100%),
-          linear-gradient(0deg, rgba(7,9,9,.92) 0%, rgba(7,9,9,.15) 42%, rgba(7,9,9,.12) 100%) !important;
+          linear-gradient(90deg, rgba(4,6,6,.44) 0%, rgba(4,6,6,.20) 58%, rgba(4,6,6,.04) 100%),
+          linear-gradient(0deg, rgba(7,9,9,.86) 0%, rgba(7,9,9,.12) 42%, rgba(7,9,9,.08) 100%) !important;
       }
     }
     @media (max-width: 620px) {
       .hero-vignette {
         background:
-          linear-gradient(0deg, rgba(7,9,9,.94) 0%, rgba(7,9,9,.48) 31%, rgba(7,9,9,.10) 66%, rgba(7,9,9,.16) 100%) !important;
+          linear-gradient(0deg, rgba(7,9,9,.88) 0%, rgba(7,9,9,.34) 31%, rgba(7,9,9,.05) 66%, rgba(7,9,9,.10) 100%) !important;
       }
-      .hero-copy { text-shadow: 0 2px 22px rgba(0,0,0,.72); }
-      .hero-meta { background: rgba(5,7,7,.58); }
+      .hero-copy { text-shadow: 0 2px 24px rgba(0,0,0,.68); }
+      .hero-meta { background: rgba(5,7,7,.50); }
     }
   </style>
 </head>
@@ -73,7 +77,6 @@
     <section class="hero" id="top" aria-labelledby="hero-title">
       <video class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true" data-hero-video>
         <source src="https://image-link.edgeone.app/1788957619264-ml7zjo.mp4" type="video/mp4" />
-        <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
       </video>
       <div class="hero-vignette" aria-hidden="true"></div>
       <div class="hero-grid" aria-hidden="true"></div>
