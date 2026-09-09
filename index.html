@@ -1,29 +1,187 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070909">
-<meta name="description" content="DIRECTIVE I — Minecraft zombie apocalypse modpack.">
-<title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
-<style>
-:root{--bg:#070909;--panel:#0c0f0f;--line:rgba(255,255,255,.12);--text:#f1f3f1;--muted:#9aa39d;--green:#73e62c;--shell:min(1180px,calc(100vw - 48px));--head:76px}*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}img,video{display:block;width:100%}.shell{width:var(--shell);margin:auto}.header{position:fixed;inset:0 0 auto;height:var(--head);z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 max(24px,calc((100vw - 1180px)/2));border-bottom:1px solid transparent;transition:.25s}.header.scrolled{background:rgba(7,9,9,.82);border-color:var(--line);backdrop-filter:blur(18px)}.brand{font-weight:950;font-size:25px;letter-spacing:-.07em;width:max-content}.brand i{font-style:normal;color:var(--green);margin-left:.16em}.nav{display:flex;gap:34px}.nav a{font-size:11px;font-weight:850;letter-spacing:.15em;text-transform:uppercase;color:#cbd0cd}.menu{display:none;justify-self:end;width:44px;height:44px;border:0;background:transparent}.menu span{display:block;width:22px;height:1px;background:#fff;margin:6px auto}.mobile{position:fixed;z-index:45;inset:var(--head) 0 0;padding:28px 22px;background:rgba(7,9,9,.98);opacity:0;visibility:hidden;transition:.2s}.mobile.open{opacity:1;visibility:visible}.mobile a{display:block;padding:22px 4px;border-bottom:1px solid var(--line);font-size:26px;font-weight:850}.hero{position:relative;min-height:100svh;overflow:hidden;isolation:isolate;display:grid;align-items:end;background:#050606}.hero video{position:absolute;inset:0;height:100%;object-fit:cover;object-position:62% center;z-index:-4;filter:saturate(.72) contrast(1.1) brightness(.7)}.shade{position:absolute;inset:0;z-index:-3;background:linear-gradient(90deg,rgba(4,6,6,.98),rgba(4,6,6,.75) 34%,rgba(4,6,6,.2) 66%),linear-gradient(0deg,#070909 0%,transparent 42%)}.grid{position:absolute;inset:0;z-index:-2;opacity:.07;background-image:linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px);background-size:72px 72px}.hero-inner{min-height:100svh;padding:calc(var(--head) + 70px) 0 82px;display:flex;flex-direction:column;justify-content:flex-end}.eyebrow,.kicker{margin:0 0 18px;font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#cbd1cd}.eyebrow:before{content:"";display:inline-block;width:30px;height:2px;background:var(--green);margin-right:10px;vertical-align:middle}.hero h1{margin:0;display:flex;align-items:baseline;gap:.1em;font-size:clamp(68px,9vw,142px);line-height:.78;letter-spacing:-.085em;font-weight:950}.hero h1 b{color:var(--green)}.subtitle{margin:24px 0 0;font-size:11px;font-weight:850;letter-spacing:.3em;text-transform:uppercase;color:#d5dbd7}.desc{max-width:580px;margin:24px 0 0;color:#b8c0bb;font-size:clamp(15px,1.5vw,19px);line-height:1.65}.actions{display:flex;gap:12px;margin-top:32px}.btn{min-height:52px;padding:0 24px;border:1px solid rgba(255,255,255,.22);background:rgba(8,10,10,.35);display:inline-flex;align-items:center;justify-content:center;gap:11px;font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;cursor:pointer}.primary{background:var(--green);border-color:var(--green);color:#071004}.play{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid currentColor}.meta{margin-top:48px;display:flex;width:max-content;border:1px solid var(--line);background:rgba(8,10,10,.48);backdrop-filter:blur(10px)}.meta div{padding:12px 24px;border-right:1px solid var(--line)}.meta div:last-child{border:0}.meta span,.meta strong{display:block}.meta span{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#7f8984}.meta strong{margin-top:5px;font-size:11px}.section{padding:112px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(50px,8vw,120px)}h2{margin:0;font-size:clamp(40px,5.4vw,74px);line-height:.98;letter-spacing:-.055em}.copy{padding-top:28px}.copy p{margin:0 0 20px;color:#cbd2cd;font-size:17px;line-height:1.75}.copy .muted{color:var(--muted);font-size:14px}.pillars{margin-top:80px;display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line)}.pillars article{min-height:184px;padding:26px;border-right:1px solid var(--line)}.pillars article:last-child{border:0}.pillars span{color:var(--green);font:800 10px ui-monospace,monospace}.pillars h3{margin:40px 0 8px;font-size:20px}.pillars p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.trailer{background:#0a0c0c;border-block:1px solid var(--line)}.trailer-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:34px}.trailer-head p:last-child{margin:0;color:var(--muted);font-size:10px;letter-spacing:.09em;text-transform:uppercase}.trailer-card{position:relative;width:100%;padding:0;aspect-ratio:16/9;overflow:hidden;border:1px solid rgba(255,255,255,.2);background:#050606;cursor:pointer}.trailer-card img{height:100%;object-fit:cover}.trailer-card:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8),transparent 55%)}.trailer-ui{position:absolute;z-index:2;inset:auto 28px 26px;display:flex;align-items:center;gap:16px}.trailer-play{width:56px;height:56px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.55);background:rgba(4,6,6,.45)}.label{display:grid;gap:4px;text-align:left}.label small{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#a9b0ac}.label strong{font-size:14px;letter-spacing:.07em}.time{margin-left:auto;font:700 11px ui-monospace,monospace}.systems h2{max-width:750px}.system-grid{margin-top:58px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}.system{min-height:210px;padding:34px;display:grid;grid-template-columns:50px 1fr;gap:20px;border-bottom:1px solid var(--line)}.system:nth-child(odd){border-right:1px solid var(--line);padding-left:0}.system .n{color:var(--green);font:700 10px ui-monospace,monospace}.system h3{margin:0;font-size:25px}.system p{margin:16px 0 0;color:var(--muted);font-size:14px;line-height:1.7}.intel{padding-top:20px}.intel-box{padding:54px;display:grid;grid-template-columns:1.1fr .9fr;gap:60px;background:#101414;border:1px solid var(--line)}.intel-box p{margin:0;color:#aeb6b1;line-height:1.75}.footer{padding:48px 0;border-top:1px solid var(--line)}.footer .shell{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}.footer p{margin:0;color:#747d78;font-size:9px;letter-spacing:.08em;text-transform:uppercase;text-align:right}.modal{width:min(1080px,calc(100vw - 28px));max-width:none;padding:0;border:1px solid rgba(255,255,255,.2);background:#050606;color:#fff}.modal::backdrop{background:rgba(0,0,0,.88);backdrop-filter:blur(8px)}.modal-top{height:64px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.modal-top small{color:var(--green);font-size:8px;letter-spacing:.18em;text-transform:uppercase}.modal-top strong{display:block;font-size:13px;letter-spacing:.12em}.close{width:40px;height:40px;border:1px solid var(--line);background:transparent;font-size:23px;cursor:pointer}.modal video{aspect-ratio:16/9;background:#000}:focus-visible{outline:2px solid var(--green);outline-offset:4px}@media(max-width:900px){:root{--shell:min(100% - 34px,1180px);--head:70px}.header{grid-template-columns:1fr auto;padding-inline:17px}.nav{display:none}.menu{display:block}.hero video{object-position:68% center}.two{grid-template-columns:1fr;gap:12px}.copy{padding-top:10px}.pillars{grid-template-columns:1fr 1fr}.pillars article:nth-child(2){border-right:0}.pillars article:nth-child(-n+2){border-bottom:1px solid var(--line)}.trailer-head{align-items:start;flex-direction:column}.system-grid{grid-template-columns:1fr}.system:nth-child(odd){border-right:0}.system{padding:30px 0}.intel-box{grid-template-columns:1fr;padding:40px}}@media(max-width:620px){:root{--shell:calc(100vw - 28px)}.brand{font-size:21px}.hero{min-height:760px}.hero video{object-position:62% center}.shade{background:linear-gradient(0deg,#070909 0%,rgba(7,9,9,.58) 52%,rgba(7,9,9,.5) 100%)}.grid{display:none}.hero-inner{min-height:760px;padding-top:118px;padding-bottom:50px}.hero h1{font-size:clamp(54px,17vw,78px)}.subtitle{font-size:9px;line-height:1.6;letter-spacing:.22em}.desc{font-size:15px;line-height:1.55}.actions{display:grid}.btn{width:100%}.meta{width:100%;display:grid;grid-template-columns:1fr 1fr}.meta div{padding:11px 13px;border-bottom:1px solid var(--line)}.meta div:nth-child(2){border-right:0}.meta div:last-child{grid-column:1/-1;border-bottom:0}.section{padding:80px 0}h2{font-size:39px}.pillars{grid-template-columns:1fr;margin-top:52px}.pillars article{min-height:150px;border-right:0;border-bottom:1px solid var(--line);padding:22px 4px}.pillars article:last-child{border-bottom:0}.trailer-card{aspect-ratio:4/3}.trailer-ui{inset:auto 15px 15px}.trailer-play{width:48px;height:48px}.time{display:none}.system{grid-template-columns:38px 1fr}.intel-box{padding:28px 22px}.footer .shell{grid-template-columns:1fr}.footer p{text-align:left}.modal{width:calc(100vw - 18px)}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero video{display:none}.hero{background:#080a0a}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#070909" />
+  <meta name="description" content="DIRECTIVE I — a cinematic Minecraft zombie apocalypse modpack." />
+  <title>DIRECTIVE I — Minecraft Zombie Apocalypse</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header class="header" data-header><a class="brand" href="#top">DIRECTIVE<i>I</i></a><nav class="nav"><a href="#overview">Overview</a><a href="#trailer">Trailer</a><a href="#systems">Systems</a><a href="#intel">Intel</a></nav><button class="menu" data-menu aria-label="Open menu"><span></span><span></span></button></header>
-<div class="mobile" data-mobile><a href="#overview">Overview</a><a href="#trailer">Trailer</a><a href="#systems">Systems</a><a href="#intel">Intel</a></div>
-<main>
-<section class="hero" id="top"><video autoplay muted loop playsinline preload="metadata" data-video data-hero></video><div class="shade"></div><div class="grid"></div><div class="shell hero-inner"><div><p class="eyebrow">Season I / Directive active</p><h1>DIRECTIVE <b>I</b></h1><p class="subtitle">Minecraft Zombie Apocalypse Modpack</p><p class="desc">A dark survival experience built around tactical combat, infected threats, scavenging, and a world that no longer feels safe.</p><div class="actions"><button class="btn primary" data-open><i class="play"></i>Watch teaser</button><a class="btn" href="#overview">Enter the directive</a></div><div class="meta"><div><span>Platform</span><strong>Minecraft Bedrock</strong></div><div><span>Genre</span><strong>Zombie Survival</strong></div><div><span>Campaign</span><strong>Season I</strong></div></div></div></div></section>
-<section class="section" id="overview"><div class="shell two"><div><p class="kicker">01 / THE DIRECTIVE</p><h2>The city fell.<br>The mission did not.</h2></div><div class="copy"><p>DIRECTIVE I is a focused cinematic apocalypse experience: tactical encounters, hostile infected, scarce resources, and weapons that feel distinct instead of interchangeable.</p><p class="muted">The presentation stays minimal and grounded—closer to a modern AAA military survival title than a crowded Minecraft mod page.</p></div></div><div class="shell pillars"><article><span>01</span><h3>Survive</h3><p>Read the environment. Pick your fights. Keep moving.</p></article><article><span>02</span><h3>Adapt</h3><p>Build a loadout around recoil, handling, range, and attachments.</p></article><article><span>03</span><h3>Engage</h3><p>Tactical gunplay against infected threats in dangerous spaces.</p></article><article><span>04</span><h3>Extract</h3><p>Scavenge what matters and make it out before the city closes in.</p></article></div></section>
-<section class="section trailer" id="trailer"><div class="shell trailer-head"><div><p class="kicker">02 / OFFICIAL TRAILER</p><h2>Transmission 001</h2></div><p>10-second cinematic teaser · 16:9 · Season I</p></div><div class="shell"><button class="trailer-card" data-open aria-label="Play DIRECTIVE I teaser"><img data-poster alt="DIRECTIVE I teaser frame"><span class="trailer-ui"><span class="trailer-play"><i class="play"></i></span><span class="label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span><span class="time">00:10</span></span></button></div></section>
-<section class="section systems" id="systems"><div class="shell"><p class="kicker">03 / CORE SYSTEMS</p><h2>Designed for consequence.</h2><div class="system-grid"><article class="system"><span class="n">01</span><div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define every firearm.</p></div></article><article class="system"><span class="n">02</span><div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of cosmetic.</p></div></article><article class="system"><span class="n">03</span><div><h3>Infected pressure</h3><p>Encounters revolve around threat, visibility, sound, and limited breathing room.</p></div></article><article class="system"><span class="n">04</span><div><h3>Dark-world atmosphere</h3><p>Controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div></article></div></div></section>
-<section class="section intel" id="intel"><div class="shell intel-box"><div><p class="kicker">04 / FIELD INTEL</p><h2>Season I is only the beginning.</h2></div><div><p>New trailer segments can be added one by one as the campaign grows. This site is already structured for the final merged trailer.</p></div></div></section>
-</main>
-<footer class="footer"><div class="shell"><a class="brand" href="#top">DIRECTIVE<i>I</i></a><p>Minecraft Zombie Apocalypse Modpack · Season I · Unofficial fan-made Minecraft project</p></div></footer>
-<dialog class="modal" data-modal><div class="modal-top"><div><small>Transmission 001</small><strong>DIRECTIVE I</strong></div><button class="close" data-close aria-label="Close">×</button></div><video controls playsinline preload="metadata" data-video data-modal-video></video></dialog>
-<script>
-const parts=['00','01','02','03','04','05','06','07'].map(n=>`assets/trailer-b64/video.part-${n}`);function b64blob(s,t){const b=atob(s.replace(/\s/g,'')),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:t})}async function media(){try{const[v,p]=await Promise.all([Promise.all(parts.map(x=>fetch(x).then(r=>{if(!r.ok)throw Error(x);return r.text()}))),fetch('assets/trailer-b64/poster.b64').then(r=>r.text())]),vu=URL.createObjectURL(b64blob(v.join(''),'video/mp4')),pu=URL.createObjectURL(b64blob(p,'image/jpeg'));document.querySelectorAll('[data-video]').forEach(x=>{x.src=vu;x.poster=pu;x.load()});document.querySelector('[data-poster]').src=pu;document.querySelector('[data-hero]').play().catch(()=>{})}catch(e){console.error(e)}}media();const h=document.querySelector('[data-header]'),mb=document.querySelector('[data-menu]'),mm=document.querySelector('[data-mobile]'),d=document.querySelector('[data-modal]'),mv=document.querySelector('[data-modal-video]');addEventListener('scroll',()=>h.classList.toggle('scrolled',scrollY>18),{passive:true});mb.onclick=()=>mm.classList.toggle('open');mm.querySelectorAll('a').forEach(a=>a.onclick=()=>mm.classList.remove('open'));document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{d.showModal?d.showModal():d.setAttribute('open','');mv.play().catch(()=>{})});document.querySelector('[data-close]').onclick=()=>{mv.pause();d.close?d.close():d.removeAttribute('open')};d.addEventListener('close',()=>mv.pause());
-</script>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" data-header>
+    <a class="brand" href="#top" aria-label="DIRECTIVE I home">
+      <span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="#overview">Overview</a>
+      <a href="#trailer">Trailer</a>
+      <a href="#systems">Systems</a>
+      <a href="#intel">Intel</a>
+    </nav>
+
+    <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" data-menu-button>
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="mobile-menu" data-mobile-menu aria-hidden="true">
+    <nav aria-label="Mobile navigation">
+      <a href="#overview">Overview</a>
+      <a href="#trailer">Trailer</a>
+      <a href="#systems">Systems</a>
+      <a href="#intel">Intel</a>
+    </nav>
+  </div>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" data-hero-video>
+        <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
+      </video>
+      <div class="hero-vignette" aria-hidden="true"></div>
+      <div class="hero-grid" aria-hidden="true"></div>
+
+      <div class="hero-content page-shell">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> Season I / Directive active</p>
+          <h1 id="hero-title"><span>DIRECTIVE</span><strong>I</strong></h1>
+          <p class="hero-subtitle">Minecraft Zombie Apocalypse Modpack</p>
+          <p class="hero-description">A dark survival experience built around tactical combat, infected threats, scavenging, and a world that no longer feels safe.</p>
+
+          <div class="hero-actions">
+            <button class="button button-primary" type="button" data-open-trailer>
+              <span class="play-triangle" aria-hidden="true"></span>
+              Watch teaser
+            </button>
+            <a class="button button-ghost" href="#overview">Enter the directive</a>
+          </div>
+        </div>
+
+        <div class="hero-meta" aria-label="Project information">
+          <div><span>Platform</span><strong>Minecraft Bedrock</strong></div>
+          <div><span>Genre</span><strong>Zombie Survival</strong></div>
+          <div><span>Campaign</span><strong>Season I</strong></div>
+        </div>
+      </div>
+
+      <a class="scroll-cue" href="#overview" aria-label="Scroll to overview">
+        <span>Scroll to survive</span><i></i>
+      </a>
+    </section>
+
+    <section class="section overview-section" id="overview">
+      <div class="page-shell two-column">
+        <div class="section-heading">
+          <p class="kicker">01 / THE DIRECTIVE</p>
+          <h2>The city fell.<br />The mission did not.</h2>
+        </div>
+        <div class="section-copy">
+          <p>DIRECTIVE I is designed as a focused, cinematic apocalypse experience: tactical encounters, hostile infected, scarce resources, and weapons that feel distinct instead of interchangeable.</p>
+          <p class="muted">The presentation stays minimal and grounded—closer to a modern AAA military survival title than a crowded Minecraft mod page.</p>
+        </div>
+      </div>
+
+      <div class="page-shell feature-strip" aria-label="Core pillars">
+        <article><span>01</span><h3>Survive</h3><p>Read the environment. Pick your fights. Keep moving.</p></article>
+        <article><span>02</span><h3>Adapt</h3><p>Build a loadout around recoil, handling, range, and attachments.</p></article>
+        <article><span>03</span><h3>Engage</h3><p>Tactical gunplay against infected threats in close, dangerous spaces.</p></article>
+        <article><span>04</span><h3>Extract</h3><p>Scavenge what matters and make it out before the city closes in.</p></article>
+      </div>
+    </section>
+
+    <section class="section trailer-section" id="trailer" aria-labelledby="trailer-title">
+      <div class="page-shell trailer-heading">
+        <div>
+          <p class="kicker">02 / OFFICIAL TRAILER</p>
+          <h2 id="trailer-title">Transmission 001</h2>
+        </div>
+        <p>10-second cinematic teaser · 16:9 · Season I</p>
+      </div>
+
+      <div class="page-shell">
+        <button class="trailer-card" type="button" data-open-trailer aria-label="Play DIRECTIVE I teaser">
+          <video class="trailer-preview" autoplay muted loop playsinline preload="metadata" aria-hidden="true" data-trailer-preview>
+            <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
+          </video>
+          <span class="trailer-shade" aria-hidden="true"></span>
+          <span class="trailer-ui">
+            <span class="trailer-play"><i class="play-triangle"></i></span>
+            <span class="trailer-label"><small>Official teaser</small><strong>DIRECTIVE I // 001</strong></span>
+            <span class="trailer-time">00:10</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section systems-section" id="systems">
+      <div class="page-shell">
+        <div class="section-heading systems-heading">
+          <p class="kicker">03 / CORE SYSTEMS</p>
+          <h2>Designed for consequence.</h2>
+          <p>Every system supports the same goal: make each encounter feel readable, deliberate, and dangerous.</p>
+        </div>
+
+        <div class="systems-grid">
+          <article class="system-card">
+            <span class="system-index">01</span>
+            <div><h3>Weapon identity</h3><p>Range, recoil, handling, ADS behavior, and attachment trade-offs define how each firearm performs.</p></div>
+          </article>
+          <article class="system-card">
+            <span class="system-index">02</span>
+            <div><h3>Ballistics</h3><p>Projectile behavior and combat feedback are built to feel physical instead of purely cosmetic.</p></div>
+          </article>
+          <article class="system-card">
+            <span class="system-index">03</span>
+            <div><h3>Infected pressure</h3><p>Encounters are staged around threat, visibility, sound, and limited breathing room.</p></div>
+          </article>
+          <article class="system-card">
+            <span class="system-index">04</span>
+            <div><h3>Dark-world atmosphere</h3><p>Minimal UI, controlled color, fog, lighting, and environmental storytelling keep the tone grounded.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section intel-section" id="intel">
+      <div class="page-shell intel-card">
+        <div>
+          <p class="kicker">04 / FIELD INTEL</p>
+          <h2>Season I is only the beginning.</h2>
+        </div>
+        <div class="intel-copy">
+          <p>New trailer segments can be added to this site one by one as the campaign grows. The media section is already structured for a longer final trailer.</p>
+          <button class="text-link" type="button" data-open-trailer>Replay transmission <span>↗</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-shell footer-grid">
+      <a class="brand footer-brand" href="#top" aria-label="DIRECTIVE I home">
+        <span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span>
+      </a>
+      <p>Minecraft Zombie Apocalypse Modpack · Season I</p>
+      <p class="footer-note">Unofficial fan-made Minecraft project. Not affiliated with Mojang or Microsoft.</p>
+    </div>
+  </footer>
+
+  <dialog class="trailer-modal" data-trailer-modal aria-labelledby="modal-title">
+    <div class="modal-frame">
+      <div class="modal-topbar">
+        <div><small>Transmission 001</small><strong id="modal-title">DIRECTIVE I</strong></div>
+        <button type="button" class="close-button" data-close-trailer aria-label="Close trailer">×</button>
+      </div>
+      <video controls playsinline preload="auto" data-modal-video>
+        <source src="assets/directive-i-transmission-001.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
 </body>
 </html>
