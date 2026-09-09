@@ -1,0 +1,195 @@
+(() => {
+  const qs = (s, root = document) => root.querySelector(s);
+  const root = qs('.welcome-shell');
+  const welcomePanel = qs('[data-stage-panel="welcome"]');
+  const termsPanel = qs('[data-stage-panel="terms"]');
+  const licensePanel = qs('[data-stage-panel="license"]');
+  const loginSheet = qs('[data-login-sheet]');
+  const backdrop = qs('[data-sheet-backdrop]');
+  const loginForm = qs('[data-login-form]');
+  const closeLogin = qs('[data-close-login]');
+  const termsReader = qs('[data-terms-reader]');
+  const termsConsent = qs('[data-terms-consent]');
+  const termsCheck = qs('[data-terms-check]');
+  const licenseCheck = qs('[data-license-check]');
+  const faqPanel = qs('[data-faq-panel]');
+  const nextButton = qs('[data-next-button]');
+  const transition = qs('[data-portal-transition]');
+  const loginCount = qs('[data-login-count]');
+  const playCount = qs('[data-play-count]');
+  const swipeTrack = qs('[data-swipe-track]');
+  const swipeHandle = qs('[data-swipe-handle]');
+  const swipeProgress = qs('[data-swipe-progress]');
+  const swipeLabel = qs('[data-swipe-label]');
+
+  const storage = {
+    getNumber(key) {
+      try { return Number(localStorage.getItem(key) || 0) || 0; } catch (_) { return 0; }
+    },
+    setNumber(key, value) {
+      try { localStorage.setItem(key, String(value)); } catch (_) {}
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, value); } catch (_) {}
+    }
+  };
+
+  function renderStats() {
+    if (loginCount) loginCount.textContent = storage.getNumber('directive_account_logins').toLocaleString();
+    if (playCount) playCount.textContent = storage.getNumber('directive_lifetime_plays').toLocaleString();
+  }
+  renderStats();
+
+  function openLogin() {
+    backdrop.hidden = false;
+    requestAnimationFrame(() => {
+      backdrop.classList.add('is-visible');
+      loginSheet.classList.add('is-visible');
+      loginSheet.setAttribute('aria-hidden', 'false');
+    });
+    setTimeout(() => loginForm?.elements?.identity?.focus(), 420);
+  }
+
+  function closeLoginSheet() {
+    backdrop.classList.remove('is-visible');
+    loginSheet.classList.remove('is-visible');
+    loginSheet.setAttribute('aria-hidden', 'true');
+    setTimeout(() => { backdrop.hidden = true; }, 360);
+  }
+
+  closeLogin?.addEventListener('click', closeLoginSheet);
+  backdrop?.addEventListener('click', closeLoginSheet);
+
+  let dragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let maxX = 0;
+
+  function measureSwipe() {
+    if (!swipeTrack || !swipeHandle) return;
+    maxX = Math.max(0, swipeTrack.clientWidth - swipeHandle.offsetWidth - 12);
+  }
+
+  function setSwipe(x, animate = false) {
+    currentX = Math.min(maxX, Math.max(0, x));
+    swipeHandle.style.transition = animate ? 'transform .38s cubic-bezier(.16,1,.3,1)' : 'none';
+    swipeProgress.style.transition = animate ? 'width .38s cubic-bezier(.16,1,.3,1)' : 'none';
+    swipeHandle.style.transform = `translate3d(${currentX}px,0,0)`;
+    swipeProgress.style.width = `${currentX + swipeHandle.offsetWidth + 6}px`;
+  }
+
+  function finishSwipe() {
+    setSwipe(maxX, true);
+    swipeLabel.textContent = 'Access requested';
+    setTimeout(openLogin, 260);
+  }
+
+  function resetSwipe() {
+    setSwipe(0, true);
+    swipeLabel.textContent = 'Swipe to start';
+  }
+
+  swipeHandle?.addEventListener('pointerdown', (event) => {
+    measureSwipe();
+    dragging = true;
+    startX = event.clientX - currentX;
+    swipeHandle.setPointerCapture?.(event.pointerId);
+  });
+
+  swipeHandle?.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+    setSwipe(event.clientX - startX);
+  });
+
+  function endSwipe() {
+    if (!dragging) return;
+    dragging = false;
+    if (maxX && currentX / maxX >= .86) finishSwipe();
+    else resetSwipe();
+  }
+
+  swipeHandle?.addEventListener('pointerup', endSwipe);
+  swipeHandle?.addEventListener('pointercancel', endSwipe);
+  swipeHandle?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      measureSwipe();
+      finishSwipe();
+    }
+  });
+  window.addEventListener('resize', () => { measureSwipe(); if (!dragging) resetSwipe(); }, { passive: true });
+  measureSwipe();
+
+  function activatePanel(nextPanel, direction = 1) {
+    [welcomePanel, termsPanel, licensePanel].forEach((panel) => {
+      if (!panel || panel === nextPanel) return;
+      panel.classList.remove('is-active', 'stage-active');
+      panel.style.opacity = '0';
+      panel.style.transform = `translate3d(${direction < 0 ? '5%' : '-5%'},0,0)`;
+      setTimeout(() => { panel.hidden = true; }, 520);
+    });
+
+    nextPanel.hidden = false;
+    nextPanel.style.opacity = '0';
+    nextPanel.style.transform = `translate3d(${direction > 0 ? '8%' : '-8%'},0,0)`;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      nextPanel.classList.add('is-active');
+      nextPanel.style.opacity = '';
+      nextPanel.style.transform = '';
+    }));
+  }
+
+  loginForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!loginForm.reportValidity()) return;
+
+    const nextLoginCount = storage.getNumber('directive_account_logins') + 1;
+    storage.setNumber('directive_account_logins', nextLoginCount);
+    storage.set('directive_local_session', String(Date.now()));
+    renderStats();
+    closeLoginSheet();
+
+    setTimeout(() => activatePanel(termsPanel, 1), 380);
+  });
+
+  function unlockTermsConsent() {
+    if (!termsReader || !termsConsent || !termsConsent.hidden) return;
+    const remaining = termsReader.scrollHeight - termsReader.scrollTop - termsReader.clientHeight;
+    if (remaining <= 26) {
+      termsConsent.hidden = false;
+      requestAnimationFrame(() => termsConsent.classList.add('is-visible'));
+    }
+  }
+
+  termsReader?.addEventListener('scroll', unlockTermsConsent, { passive: true });
+  setTimeout(unlockTermsConsent, 300);
+
+  termsCheck?.addEventListener('change', () => {
+    if (!termsCheck.checked) return;
+    setTimeout(() => activatePanel(licensePanel, 1), 220);
+  });
+
+  licenseCheck?.addEventListener('change', () => {
+    if (!faqPanel) return;
+    if (licenseCheck.checked) {
+      faqPanel.hidden = false;
+      requestAnimationFrame(() => faqPanel.classList.add('is-visible'));
+      setTimeout(() => faqPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 160);
+    } else {
+      faqPanel.classList.remove('is-visible');
+      setTimeout(() => { faqPanel.hidden = true; }, 320);
+    }
+  });
+
+  nextButton?.addEventListener('click', () => {
+    if (!licenseCheck?.checked) return;
+
+    const plays = storage.getNumber('directive_lifetime_plays') + 1;
+    storage.setNumber('directive_lifetime_plays', plays);
+    storage.set('directive_onboarding_complete', '1');
+    try { sessionStorage.setItem('directive_home_entry', '1'); } catch (_) {}
+
+    transition.classList.add('is-closing');
+    setTimeout(() => { window.location.href = 'index.html'; }, 980);
+  });
+})();
