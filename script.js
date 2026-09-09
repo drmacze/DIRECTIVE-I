@@ -4,6 +4,7 @@ const mobileMenu = document.querySelector('[data-mobile-menu]');
 const modal = document.querySelector('[data-trailer-modal]');
 const modalVideo = document.querySelector('[data-modal-video]');
 const heroVideo = document.querySelector('[data-hero-video]');
+const heroDescription = document.querySelector('.hero-description');
 const trailerPreview = document.querySelector('[data-trailer-preview]');
 const openTrailerButtons = document.querySelectorAll('[data-open-trailer]');
 const closeTrailerButton = document.querySelector('[data-close-trailer]');
@@ -29,6 +30,49 @@ menuButton?.addEventListener('click', () => {
 });
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+
+function initHeroTyping() {
+  if (!heroDescription) return;
+
+  const fullText = heroDescription.textContent.trim();
+  if (!fullText) return;
+
+  heroDescription.setAttribute('aria-label', fullText);
+  heroDescription.setAttribute('aria-live', 'off');
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    heroDescription.textContent = fullText;
+    return;
+  }
+
+  heroDescription.textContent = '';
+  heroDescription.classList.add('is-typing');
+
+  let index = 0;
+
+  const typeNext = () => {
+    if (index >= fullText.length) {
+      heroDescription.classList.remove('is-typing');
+      heroDescription.classList.add('is-typed');
+      return;
+    }
+
+    const char = fullText.charAt(index);
+    heroDescription.textContent += char;
+    index += 1;
+
+    let delay = 27;
+    if (char === ' ') delay = 14;
+    if (char === ',' || char === ';' || char === ':') delay = 68;
+    if (char === '.' || char === '!' || char === '?') delay = 135;
+
+    window.setTimeout(typeNext, delay);
+  };
+
+  window.setTimeout(typeNext, 520);
+}
+
+initHeroTyping();
 
 let heroResumeTimer = 0;
 let heroVisible = true;
