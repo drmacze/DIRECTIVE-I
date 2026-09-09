@@ -220,3 +220,5 @@
     dock.hidden = true;
   }
 })();
+
+import('./profile-logout.js?v=2').catch(() => {});
