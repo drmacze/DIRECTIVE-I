@@ -6,7 +6,11 @@
   <meta name="theme-color" content="#050707" />
   <meta name="description" content="DIRECTIVE I secure access and onboarding." />
   <title>DIRECTIVE I — Secure Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="welcome.css?v=1" />
+  <link rel="stylesheet" href="welcome-polish.css?v=1" />
 </head>
 <body>
   <main class="welcome-shell" data-stage="welcome">
@@ -19,8 +23,11 @@
 
       <div class="welcome-center">
         <p class="welcome-kicker">Secure onboarding protocol</p>
-        <h1 id="welcome-title">Welcome to<br><span>Directive I.</span></h1>
-        <p class="welcome-copy">Authenticate your access, review field terms, and enter the active Season I network.</p>
+        <h1 id="welcome-title">
+          <span class="welcome-title-line"><span>Welcome to</span></span>
+          <span class="welcome-title-line is-accent"><span>Directive I.</span></span>
+        </h1>
+        <p class="welcome-copy">Authenticate your Minecraft identity, review field terms, and enter the active Season I network.</p>
 
         <div class="welcome-stats" aria-label="Access statistics">
           <article><small>Account logins</small><strong data-login-count>0</strong><em>This device</em></article>
@@ -53,7 +60,7 @@
             <p>DIRECTIVE I is an unofficial fan-made Minecraft project. Access to this site and its content is provided for personal use, testing, community participation, and project evaluation.</p>
             <p>You agree not to misrepresent project content as official Mojang or Microsoft material, not to redistribute protected project files under another identity, and not to intentionally interfere with site availability or other users.</p>
             <h3>Account and access</h3>
-            <p>Keep your own access credentials private. This static preview currently creates only a local browser session and does not transmit or store your password. A production account backend may replace this local access layer later.</p>
+            <p>Account access is designed to use Microsoft/Xbox authentication for a Minecraft identity. DIRECTIVE I must never request or store your Microsoft account password directly. Verified profile data may include your Xbox gamertag and account identifiers required for account linking.</p>
             <h3>Gameplay and content</h3>
             <p>DIRECTIVE I contains fictional outbreak, military, survival, and combat themes. Features, supported Minecraft versions, balancing, downloads, and campaign content can change as the project develops.</p>
             <h3>Availability</h3>
@@ -93,8 +100,8 @@
           <div class="faq-heading"><p>Clearance accepted</p><h3>FAQ</h3></div>
           <details><summary>Is DIRECTIVE I official Minecraft content?</summary><p>No. It is an independent fan-made project.</p></details>
           <details><summary>What Minecraft version is currently supported?</summary><p>The current listed support target is Minecraft Bedrock 26.40.</p></details>
-          <details><summary>Does this page store my password?</summary><p>No. This static preview only validates the form locally and never stores the password.</p></details>
-          <details><summary>Can the supported version change?</summary><p>Yes. Compatibility can change as the project is updated.</p></details>
+          <details><summary>How does Minecraft login work?</summary><p>Authentication is designed to pass through Microsoft/Xbox sign-in. DIRECTIVE I does not ask for or store your Microsoft password directly.</p></details>
+          <details><summary>What profile information can be used?</summary><p>After Xbox identity verification, account linking can use profile information such as the player's gamertag and required Xbox identifiers.</p></details>
           <button class="next-button" type="button" data-next-button>Enter Directive I <span>→</span></button>
         </div>
       </div>
@@ -104,19 +111,25 @@
   <div class="sheet-backdrop" data-sheet-backdrop hidden></div>
   <section class="login-sheet" data-login-sheet aria-hidden="true" aria-labelledby="login-title">
     <div class="sheet-grabber"></div>
-    <div class="sheet-head"><div><small>Secure access</small><h2 id="login-title">Agent login.</h2></div><button type="button" data-close-login aria-label="Close login">×</button></div>
-    <form data-login-form>
-      <label><span>Email / Agent ID</span><input type="text" name="identity" autocomplete="username" required placeholder="agent@apex.net" /></label>
-      <label><span>Access key</span><input type="password" name="password" autocomplete="current-password" required minlength="4" placeholder="••••••••" /></label>
-      <p class="login-note">Preview access is local to this browser. Passwords are never stored.</p>
-      <button class="login-submit" type="submit">Authenticate <span>→</span></button>
-    </form>
+    <div class="sheet-head"><div><small>Minecraft identity</small><h2 id="login-title">Connect your account.</h2></div><button type="button" data-close-login aria-label="Close login">×</button></div>
+    <div class="minecraft-login-wrap">
+      <button class="minecraft-login-button" type="button" data-minecraft-login>
+        <span class="microsoft-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>Login with Minecraft</span>
+      </button>
+      <div class="minecraft-login-meta" data-minecraft-profile hidden>
+        <span class="profile-orb">MC</span>
+        <div><strong data-minecraft-gamertag>Minecraft account</strong><span data-minecraft-profile-meta>Xbox profile verified</span></div>
+      </div>
+      <p class="minecraft-auth-status" data-minecraft-auth-status>Your Microsoft password is handled by Microsoft/Xbox, never by this page. Gamertag and Xbox identity can be linked after successful authorization.</p>
+    </div>
   </section>
 
   <div class="portal-transition" data-portal-transition aria-hidden="true">
     <i class="portal-top"></i><i class="portal-right"></i><i class="portal-bottom"></i><i class="portal-left"></i>
   </div>
 
-  <script src="welcome.js?v=1"></script>
+  <script src="welcome.js?v=2"></script>
+  <script src="minecraft-auth.js?v=1"></script>
 </body>
 </html>
