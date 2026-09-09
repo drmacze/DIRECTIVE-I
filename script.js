@@ -8,9 +8,6 @@ const trailerPreview = document.querySelector('[data-trailer-preview]');
 const openTrailerButtons = document.querySelectorAll('[data-open-trailer]');
 const closeTrailerButton = document.querySelector('[data-close-trailer]');
 
-const HERO_BACKGROUND_URL = 'https://image-link.edgeone.app/1788957619264-ml7zjo.mp4';
-const HERO_FALLBACK_URL = 'assets/directive-i-transmission-001.mp4';
-
 const syncHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
 syncHeader();
 window.addEventListener('scroll', syncHeader, { passive: true });
@@ -33,8 +30,7 @@ menuButton?.addEventListener('click', () => {
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 
-let usingHeroFallback = false;
-let heroRecoveryTimer = 0;
+let heroResumeTimer = 0;
 
 function heroCanPlay() {
   return Boolean(heroVideo && !document.hidden && !modal?.open);
@@ -42,64 +38,61 @@ function heroCanPlay() {
 
 function configureHeroVideo() {
   if (!heroVideo) return;
-  heroVideo.preload = 'auto';
+
+  // Keep the source declared in HTML. Reassigning heroVideo.src here caused
+  // Safari/iOS to abort the first request and begin downloading the same MP4 again.
   heroVideo.autoplay = true;
   heroVideo.muted = true;
   heroVideo.defaultMuted = true;
   heroVideo.loop = true;
   heroVideo.playsInline = true;
+  heroVideo.preload = 'auto';
+  heroVideo.setAttribute('muted', '');
   heroVideo.setAttribute('playsinline', '');
   heroVideo.setAttribute('webkit-playsinline', '');
   heroVideo.setAttribute('disablepictureinpicture', '');
-  heroVideo.src = HERO_BACKGROUND_URL;
-  heroVideo.load();
+
+  try { heroVideo.disablePictureInPicture = true; } catch (_) {}
 }
 
-function resumeHero(reset = false) {
+function resumeHero(restart = false) {
   if (!heroCanPlay() || !heroVideo) return;
-  if (reset || heroVideo.ended) {
+
+  if (restart) {
     try { heroVideo.currentTime = 0; } catch (_) {}
   }
-  const promise = heroVideo.play();
-  if (promise?.catch) promise.catch(() => {});
+
+  const playPromise = heroVideo.play();
+  if (playPromise?.catch) playPromise.catch(() => {});
 }
 
-function recoverHero(delay = 250) {
-  window.clearTimeout(heroRecoveryTimer);
-  heroRecoveryTimer = window.setTimeout(() => {
+function scheduleHeroResume(delay = 220) {
+  window.clearTimeout(heroResumeTimer);
+  heroResumeTimer = window.setTimeout(() => {
     if (!heroCanPlay() || !heroVideo) return;
-    if (heroVideo.ended || (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0 && heroVideo.currentTime >= heroVideo.duration - 0.12)) {
-      resumeHero(true);
-      return;
-    }
-    if (heroVideo.paused) resumeHero(false);
+    if (heroVideo.ended) resumeHero(true);
+    else if (heroVideo.paused) resumeHero(false);
   }, delay);
 }
 
 if (heroVideo) {
   configureHeroVideo();
-  heroVideo.addEventListener('loadedmetadata', () => resumeHero(false));
-  heroVideo.addEventListener('canplay', () => resumeHero(false));
+
+  // Native loop is the primary loop mechanism. These handlers only recover
+  // from browser/OS pauses; buffering events are intentionally left alone so
+  // Safari can manage its own network buffer without playback thrashing.
+  heroVideo.addEventListener('loadedmetadata', () => resumeHero(false), { once: true });
+  heroVideo.addEventListener('canplay', () => resumeHero(false), { once: true });
   heroVideo.addEventListener('ended', () => resumeHero(true));
   heroVideo.addEventListener('pause', () => {
-    if (heroCanPlay()) recoverHero(180);
-  });
-  heroVideo.addEventListener('waiting', () => recoverHero(500));
-  heroVideo.addEventListener('stalled', () => recoverHero(700));
-  heroVideo.addEventListener('suspend', () => recoverHero(500));
-  heroVideo.addEventListener('error', () => {
-    if (usingHeroFallback) return;
-    usingHeroFallback = true;
-    heroVideo.src = HERO_FALLBACK_URL;
-    heroVideo.load();
-    resumeHero(false);
+    if (heroCanPlay() && !heroVideo.ended) scheduleHeroResume(240);
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !modal?.open) resumeHero(false);
+    if (!document.hidden && !modal?.open) scheduleHeroResume(80);
   });
-  window.addEventListener('pageshow', () => resumeHero(false));
-  window.addEventListener('focus', () => resumeHero(false));
+  window.addEventListener('pageshow', () => scheduleHeroResume(80));
+  window.addEventListener('focus', () => scheduleHeroResume(120));
   document.addEventListener('touchstart', () => {
     if (heroCanPlay() && heroVideo.paused) resumeHero(false);
   }, { passive: true });
@@ -123,7 +116,7 @@ function closeTrailer() {
   modalVideo?.pause();
   if (typeof modal.close === 'function') modal.close();
   else modal.removeAttribute('open');
-  resumeHero(false);
+  scheduleHeroResume(60);
   trailerPreview?.play().catch(() => {});
 }
 
@@ -141,6 +134,6 @@ modal?.addEventListener('cancel', (event) => {
 
 modal?.addEventListener('close', () => {
   modalVideo?.pause();
-  resumeHero(false);
+  scheduleHeroResume(60);
   trailerPreview?.play().catch(() => {});
 });
