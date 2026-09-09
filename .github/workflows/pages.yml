@@ -24,14 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Rebuild trailer assets
-        shell: bash
-        run: |
-          set -e
-          mkdir -p assets
-          cat assets/trailer-b64/video.part-* | tr -d '\n\r ' | base64 --decode > assets/directive-i-teaser-01.mp4
-          tr -d '\n\r ' < assets/trailer-b64/poster.b64 | base64 --decode > assets/trailer-poster.jpg
-          touch .nojekyll
+      - name: Prepare static site
+        run: touch .nojekyll
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
