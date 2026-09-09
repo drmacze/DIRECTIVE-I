@@ -25,8 +25,13 @@
       gamerpic: account?.gamerpic || '',
       gamerscore: account?.gamerscore || '',
       provider: account?.provider || 'Microsoft/Xbox',
-      authenticated: true
+      authenticated: true,
+      updatedAt: Date.now()
     };
+
+    try {
+      localStorage.setItem('directive_minecraft_profile', JSON.stringify(safeAccount));
+    } catch (_) {}
 
     if (gamertag) gamertag.textContent = safeAccount.gamertag || 'Minecraft account connected';
     if (profileMeta) {
