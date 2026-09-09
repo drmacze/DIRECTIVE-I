@@ -11,63 +11,6 @@ const closeTrailerButton = document.querySelector('[data-close-trailer]');
 const HERO_BACKGROUND_URL = 'https://image-link.edgeone.app/1788957619264-ml7zjo.mp4';
 const HERO_LOCAL_FALLBACK = 'assets/directive-i-transmission-001.mp4';
 
-function installCinematicHeroTuning() {
-  const style = document.createElement('style');
-  style.dataset.directiveHeroTuning = 'true';
-  style.textContent = `
-    .hero-video {
-      object-position: center center !important;
-      filter: saturate(.92) contrast(1.04) brightness(.96) !important;
-      transform: scale(1.005) !important;
-    }
-    .hero-vignette {
-      background:
-        linear-gradient(90deg, rgba(4,6,6,.84) 0%, rgba(4,6,6,.54) 34%, rgba(4,6,6,.12) 66%, rgba(4,6,6,.18) 100%),
-        linear-gradient(0deg, rgba(7,9,9,.74) 0%, rgba(7,9,9,.08) 42%, rgba(7,9,9,.12) 100%) !important;
-    }
-    @media (max-width: 620px) {
-      .hero-video {
-        object-position: center center !important;
-        filter: saturate(.94) contrast(1.03) brightness(.94) !important;
-      }
-      .hero-vignette {
-        background: linear-gradient(0deg,
-          rgba(7,9,9,.88) 0%,
-          rgba(7,9,9,.48) 43%,
-          rgba(7,9,9,.16) 70%,
-          rgba(7,9,9,.08) 100%) !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-function loadHighQualityHeroVideo() {
-  if (!heroVideo) return;
-
-  let usingFallback = false;
-  heroVideo.preload = 'auto';
-  heroVideo.muted = true;
-  heroVideo.loop = true;
-  heroVideo.playsInline = true;
-
-  const fallbackToLocal = () => {
-    if (usingFallback) return;
-    usingFallback = true;
-    heroVideo.src = HERO_LOCAL_FALLBACK;
-    heroVideo.load();
-    heroVideo.play().catch(() => {});
-  };
-
-  heroVideo.addEventListener('error', fallbackToLocal, { once: true });
-  heroVideo.src = HERO_BACKGROUND_URL;
-  heroVideo.load();
-  heroVideo.play().catch(() => {});
-}
-
-installCinematicHeroTuning();
-loadHighQualityHeroVideo();
-
 const syncHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
 syncHeader();
 window.addEventListener('scroll', syncHeader, { passive: true });
@@ -90,6 +33,86 @@ menuButton?.addEventListener('click', () => {
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 
+let heroInView = true;
+let usingHeroFallback = false;
+let recoveryTimer = 0;
+
+function heroShouldPlay() {
+  return Boolean(heroVideo && !document.hidden && !modal?.open && heroInView);
+}
+
+function setHeroSource(src) {
+  if (!heroVideo) return;
+  heroVideo.src = src;
+  heroVideo.load();
+}
+
+function playHero({ resetIfEnded = false } = {}) {
+  if (!heroShouldPlay() || !heroVideo) return;
+  heroVideo.muted = true;
+  heroVideo.loop = true;
+  heroVideo.playsInline = true;
+  if (resetIfEnded && (heroVideo.ended || (Number.isFinite(heroVideo.duration) && heroVideo.currentTime >= heroVideo.duration - 0.08))) {
+    try { heroVideo.currentTime = 0; } catch (_) {}
+  }
+  if (heroVideo.paused || heroVideo.ended) heroVideo.play().catch(() => {});
+}
+
+function scheduleHeroRecovery(delay = 350) {
+  window.clearTimeout(recoveryTimer);
+  recoveryTimer = window.setTimeout(() => playHero({ resetIfEnded: true }), delay);
+}
+
+if (heroVideo) {
+  heroVideo.preload = 'auto';
+  heroVideo.muted = true;
+  heroVideo.loop = true;
+  heroVideo.setAttribute('playsinline', '');
+  heroVideo.setAttribute('webkit-playsinline', '');
+
+  // Force the direct source once so iOS does not stay on an older locally cached asset.
+  setHeroSource(HERO_BACKGROUND_URL);
+
+  heroVideo.addEventListener('loadeddata', () => playHero());
+  heroVideo.addEventListener('canplay', () => playHero());
+  heroVideo.addEventListener('ended', () => playHero({ resetIfEnded: true }));
+  heroVideo.addEventListener('pause', () => {
+    if (heroShouldPlay()) scheduleHeroRecovery(180);
+  });
+  heroVideo.addEventListener('stalled', () => {
+    if (heroShouldPlay()) scheduleHeroRecovery(700);
+  });
+  heroVideo.addEventListener('waiting', () => {
+    if (heroShouldPlay()) scheduleHeroRecovery(700);
+  });
+  heroVideo.addEventListener('error', () => {
+    if (usingHeroFallback) return;
+    usingHeroFallback = true;
+    setHeroSource(HERO_LOCAL_FALLBACK);
+    playHero();
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      heroInView = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.08);
+      if (heroInView) playHero({ resetIfEnded: true });
+      else heroVideo.pause();
+    }, { threshold: [0, 0.08, 0.25] });
+    observer.observe(heroVideo.closest('.hero') || heroVideo);
+  }
+
+  // Safari/iOS can pause muted background video after temporary network or memory pressure.
+  // Resume only while the hero is visible and no trailer modal is open.
+  window.setInterval(() => {
+    if (heroShouldPlay() && (heroVideo.paused || heroVideo.ended)) {
+      playHero({ resetIfEnded: true });
+    }
+  }, 2000);
+
+  playHero();
+}
+
 function openTrailer() {
   if (!modal || !modalVideo) return;
   heroVideo?.pause();
@@ -106,7 +129,7 @@ function closeTrailer() {
   modalVideo?.pause();
   if (typeof modal.close === 'function') modal.close();
   else modal.removeAttribute('open');
-  heroVideo?.play().catch(() => {});
+  playHero({ resetIfEnded: true });
   trailerPreview?.play().catch(() => {});
 }
 
@@ -124,7 +147,7 @@ modal?.addEventListener('cancel', (event) => {
 
 modal?.addEventListener('close', () => {
   modalVideo?.pause();
-  heroVideo?.play().catch(() => {});
+  playHero({ resetIfEnded: true });
   trailerPreview?.play().catch(() => {});
 });
 
@@ -133,7 +156,10 @@ document.addEventListener('visibilitychange', () => {
     heroVideo?.pause();
     trailerPreview?.pause();
   } else if (!modal?.open) {
-    heroVideo?.play().catch(() => {});
+    playHero({ resetIfEnded: true });
     trailerPreview?.play().catch(() => {});
   }
 });
+
+window.addEventListener('pageshow', () => playHero({ resetIfEnded: true }));
+window.addEventListener('focus', () => playHero({ resetIfEnded: true }));
