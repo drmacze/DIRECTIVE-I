@@ -30,61 +30,105 @@ jobs:
           set -euo pipefail
           mkdir -p assets
 
-          cat assets/transmission-v2-b64/part-* | tr -d '\n\r ' | base64 --decode > assets/directive-i-transmission-001.mp4
-          test -s assets/directive-i-transmission-001.mp4
-
           if ! command -v ffmpeg >/dev/null 2>&1; then
             sudo apt-get update -qq
             sudo apt-get install -y ffmpeg
           fi
 
-          HERO_SOURCE="assets/directive-i-hero-source.mp4"
           HERO_OUTPUT="assets/directive-i-hero-1080.mp4"
+          HERO_SOURCE="assets/directive-i-hero-source.mp4"
           HERO_URL="https://image-link.edgeone.app/1788957619264-ml7zjo.mp4"
+          TRAILER="assets/directive-i-transmission-001.mp4"
 
-          if curl -fL \
-            --retry 1 \
-            --retry-delay 1 \
-            --retry-all-errors \
-            --connect-timeout 8 \
-            --max-time 30 \
-            --speed-time 10 \
-            --speed-limit 100000 \
-            -A "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1" \
-            "$HERO_URL" \
-            -o "$HERO_SOURCE" \
-            && ffprobe -v error "$HERO_SOURCE" >/dev/null 2>&1; then
-            echo "Using full cinematic source for hero."
+          validate_video() {
+            local input="$1"
+            local errors
+            [ -s "$input" ] || return 1
+            ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height -of csv=p=0 "$input" >/dev/null 2>&1 || return 1
+            errors="$(mktemp)"
+            if ! ffmpeg -hide_banner -v error -i "$input" -map 0:v:0 -an -f null - 2>"$errors"; then
+              cat "$errors" >&2
+              rm -f "$errors"
+              return 1
+            fi
+            if [ -s "$errors" ]; then
+              cat "$errors" >&2
+              rm -f "$errors"
+              return 1
+            fi
+            rm -f "$errors"
+            return 0
+          }
+
+          # A real committed hero file is authoritative. Never overwrite it with
+          # a network fallback or with reconstructed trailer chunks.
+          if validate_video "$HERO_OUTPUT"; then
+            echo "Using validated committed hero media."
           else
-            echo "Remote cinematic source unavailable; falling back to repository media."
-            cp assets/directive-i-transmission-001.mp4 "$HERO_SOURCE"
+            rm -f "$HERO_OUTPUT"
+
+            # Remote fetch is only a secondary source. It must decode cleanly
+            # before it is allowed anywhere near production.
+            if curl -fL \
+              --retry 1 \
+              --retry-delay 1 \
+              --retry-all-errors \
+              --connect-timeout 8 \
+              --max-time 30 \
+              --speed-time 10 \
+              --speed-limit 100000 \
+              -A "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1" \
+              "$HERO_URL" \
+              -o "$HERO_SOURCE" \
+              && validate_video "$HERO_SOURCE"; then
+                echo "Using validated remote cinematic source."
+                ffmpeg -hide_banner -loglevel error -y \
+                  -i "$HERO_SOURCE" \
+                  -vf "scale=1920:1080:force_original_aspect_ratio=increase:flags=lanczos,crop=1920:1080,unsharp=5:5:0.35:5:5:0.0" \
+                  -an \
+                  -c:v libx264 \
+                  -preset veryfast \
+                  -crf 18 \
+                  -profile:v high \
+                  -level 4.1 \
+                  -pix_fmt yuv420p \
+                  -movflags +faststart \
+                  -g 60 \
+                  -keyint_min 30 \
+                  "$HERO_OUTPUT"
+                validate_video "$HERO_OUTPUT"
+            else
+              rm -f "$HERO_SOURCE"
+              echo "ERROR: no healthy hero MP4 is available. Refusing to deploy another corrupt/fake 1080p video." >&2
+              echo "Commit a validated file at assets/directive-i-hero-1080.mp4 and push again." >&2
+              exit 1
+            fi
+          fi
+
+          # Trailer is optional for the hero deployment. Rebuild it only if the
+          # old chunks happen to be valid; otherwise keep the page functional
+          # without allowing corrupt trailer bytes to poison the hero.
+          if compgen -G 'assets/transmission-v2-b64/part-*' >/dev/null; then
+            cat assets/transmission-v2-b64/part-* | tr -d '\n\r ' | base64 --decode > "$TRAILER" || true
+            if ! validate_video "$TRAILER"; then
+              echo "WARNING: reconstructed trailer is corrupt; removing it from this deployment." >&2
+              rm -f "$TRAILER"
+            fi
           fi
 
           ffmpeg -hide_banner -loglevel error -y \
-            -i "$HERO_SOURCE" \
-            -vf "scale=1920:1080:force_original_aspect_ratio=increase:flags=lanczos,crop=1920:1080,unsharp=5:5:0.35:5:5:0.0" \
-            -an \
-            -c:v libx264 \
-            -preset veryfast \
-            -crf 18 \
-            -profile:v high \
-            -level 4.1 \
-            -pix_fmt yuv420p \
-            -movflags +faststart \
-            -g 60 \
-            -keyint_min 30 \
-            "$HERO_OUTPUT"
-
-          ffmpeg -hide_banner -loglevel error -y \
             -ss 0.35 -i "$HERO_OUTPUT" -frames:v 1 -q:v 2 assets/directive-i-hero-poster.jpg
-          ffmpeg -hide_banner -loglevel error -y \
-            -ss 0.35 -i assets/directive-i-transmission-001.mp4 -frames:v 1 -q:v 2 assets/directive-i-trailer-poster.jpg
+
+          if [ -s "$TRAILER" ]; then
+            ffmpeg -hide_banner -loglevel error -y \
+              -ss 0.35 -i "$TRAILER" -frames:v 1 -q:v 2 assets/directive-i-trailer-poster.jpg
+          else
+            cp assets/directive-i-hero-poster.jpg assets/directive-i-trailer-poster.jpg
+          fi
 
           ffprobe -v error -select_streams v:0 \
             -show_entries stream=width,height,codec_name,pix_fmt \
             -of default=noprint_wrappers=1 "$HERO_OUTPUT"
-          test -s "$HERO_OUTPUT"
-          test -s assets/directive-i-hero-poster.jpg
 
           rm -f "$HERO_SOURCE"
           rm -rf assets/transmission-v2-b64 assets/transmission-001-b64 assets/trailer-b64
