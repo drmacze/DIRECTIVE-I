@@ -96,6 +96,10 @@
   restore();
   window.addEventListener('pagehide',persist);
 
-  const homeEntry = (()=>{try{return sessionStorage.getItem('directive_home_entry')==='1'}catch(_){return false}})();
-  setTimeout(()=>open(true), homeEntry ? 1450 : 700);
+  const params = new URLSearchParams(location.search);
+  const enteredFromAuth = params.get('music') === '1' || params.get('auth') === 'success';
+  setTimeout(() => {
+    open(true);
+    if (enteredFromAuth && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
+  }, enteredFromAuth ? 1450 : 700);
 })();
