@@ -6,8 +6,8 @@
   const licensePanel = qs('[data-stage-panel="license"]');
   const loginSheet = qs('[data-login-sheet]');
   const backdrop = qs('[data-sheet-backdrop]');
-  const loginForm = qs('[data-login-form]');
   const closeLogin = qs('[data-close-login]');
+  const minecraftLoginButton = qs('[data-minecraft-login]');
   const termsReader = qs('[data-terms-reader]');
   const termsConsent = qs('[data-terms-consent]');
   const termsCheck = qs('[data-terms-check]');
@@ -47,7 +47,7 @@
       loginSheet.classList.add('is-visible');
       loginSheet.setAttribute('aria-hidden', 'false');
     });
-    setTimeout(() => loginForm?.elements?.identity?.focus(), 420);
+    setTimeout(() => minecraftLoginButton?.focus(), 420);
   }
 
   function closeLoginSheet() {
@@ -80,7 +80,7 @@
 
   function finishSwipe() {
     setSwipe(maxX, true);
-    swipeLabel.textContent = 'Access requested';
+    swipeLabel.textContent = 'Identity required';
     setTimeout(openLogin, 260);
   }
 
@@ -139,17 +139,20 @@
     }));
   }
 
-  loginForm?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    if (!loginForm.reportValidity()) return;
-
+  window.addEventListener('directive:minecraft-authenticated', (event) => {
+    const account = event.detail || {};
     const nextLoginCount = storage.getNumber('directive_account_logins') + 1;
     storage.setNumber('directive_account_logins', nextLoginCount);
     storage.set('directive_local_session', String(Date.now()));
+    try {
+      sessionStorage.setItem('directive_minecraft_gamertag', account.gamertag || '');
+      sessionStorage.setItem('directive_minecraft_xuid', account.xuid || '');
+    } catch (_) {}
     renderStats();
-    closeLoginSheet();
-
-    setTimeout(() => activatePanel(termsPanel, 1), 380);
+    setTimeout(() => {
+      closeLoginSheet();
+      setTimeout(() => activatePanel(termsPanel, 1), 380);
+    }, 520);
   });
 
   function unlockTermsConsent() {
