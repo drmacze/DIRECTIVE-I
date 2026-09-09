@@ -1,0 +1,48 @@
+name: Import Worry soundtrack media
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-worry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-worry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download Worry soundtrack and cover
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/audio assets/music
+          curl -L --fail --retry 2 --connect-timeout 20 \
+            'https://ucdeaa6cd71bdb4b0a868d90ce03.dl.dropboxusercontent.com/cd/0/get/DH3UMLA5QW8YUE7CmZMCWe5emcPoHAMxKs-O8D7d95OhfDPSMCkHOtZfpbFJ5__uOFKObfXRgQskZdoV5GzsV8Nw7AtMDQXaimDyu8QpmPUxrxfFs5XO5pU7VjzSPciXhhbayg5XmCrmRfA2Jy0eP1taGWwfkpHRpQm_pK06mHPTgg/file?c_luid=9f5de864' \
+            -o assets/audio/worry.mp3
+          curl -L --fail --retry 2 --connect-timeout 20 \
+            'https://uceba075027126e1197f9fb453db.dl.dropboxusercontent.com/cd/0/get/DH1W2TC_sjxCL4GLyGjJM89SiWRkuwPDvCmRvwOhpK48RQYiSjqMMrBPtYQeyUDQynIUrk5hg3_uUSibHB6IS2EWRLotXOo25reOGvd-fkICv5wGWMoGGjWeuAQ9vKqr5I4aalt9JAGznOxmgentZtK4eYYHwReKyeHXC-SPG5Zf8A/file?c_luid=9f5de864' \
+            -o assets/music/worry-cover.jpg
+          test "$(stat -c%s assets/audio/worry.mp3)" -eq 3073298
+          test "$(stat -c%s assets/music/worry-cover.jpg)" -eq 62114
+
+      - name: Commit Worry media into GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/audio/worry.mp3 assets/music/worry-cover.jpg
+          if git diff --cached --quiet; then
+            echo 'Worry media already present.'
+            exit 0
+          fi
+          git commit -m 'Host Worry soundtrack media on GitHub Pages'
+          git push origin HEAD:main
