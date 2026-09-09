@@ -31,16 +31,17 @@ menuButton?.addEventListener('click', () => {
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 
 let heroResumeTimer = 0;
+let heroVisible = true;
+let lastRenderedFrameAt = performance.now();
+let lastDecodeNudgeAt = 0;
 
 function heroCanPlay() {
-  return Boolean(heroVideo && !document.hidden && !modal?.open);
+  return Boolean(heroVideo && heroVisible && !document.hidden && !modal?.open);
 }
 
 function configureHeroVideo() {
   if (!heroVideo) return;
 
-  // Keep the source declared in HTML. Reassigning heroVideo.src here caused
-  // Safari/iOS to abort the first request and begin downloading the same MP4 again.
   heroVideo.autoplay = true;
   heroVideo.muted = true;
   heroVideo.defaultMuted = true;
@@ -48,9 +49,12 @@ function configureHeroVideo() {
   heroVideo.playsInline = true;
   heroVideo.preload = 'auto';
   heroVideo.setAttribute('muted', '');
+  heroVideo.setAttribute('autoplay', '');
+  heroVideo.setAttribute('loop', '');
   heroVideo.setAttribute('playsinline', '');
   heroVideo.setAttribute('webkit-playsinline', '');
   heroVideo.setAttribute('disablepictureinpicture', '');
+  heroVideo.setAttribute('x-webkit-airplay', 'deny');
 
   try { heroVideo.disablePictureInPicture = true; } catch (_) {}
 }
@@ -66,39 +70,92 @@ function resumeHero(restart = false) {
   if (playPromise?.catch) playPromise.catch(() => {});
 }
 
-function scheduleHeroResume(delay = 220) {
+function scheduleHeroResume(delay = 120) {
   window.clearTimeout(heroResumeTimer);
   heroResumeTimer = window.setTimeout(() => {
     if (!heroCanPlay() || !heroVideo) return;
-    if (heroVideo.ended) resumeHero(true);
-    else if (heroVideo.paused) resumeHero(false);
+    resumeHero(heroVideo.ended);
   }, delay);
+}
+
+function nudgeHeroDecoder() {
+  if (!heroCanPlay() || !heroVideo) return;
+  const now = performance.now();
+  if (now - lastDecodeNudgeAt < 5000) return;
+  lastDecodeNudgeAt = now;
+
+  const position = heroVideo.currentTime || 0;
+  try {
+    heroVideo.pause();
+    if (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+      heroVideo.currentTime = Math.min(position + 0.01, Math.max(0, heroVideo.duration - 0.05));
+    }
+  } catch (_) {}
+  resumeHero(false);
 }
 
 if (heroVideo) {
   configureHeroVideo();
 
-  // Native loop is the primary loop mechanism. These handlers only recover
-  // from browser/OS pauses; buffering events are intentionally left alone so
-  // Safari can manage its own network buffer without playback thrashing.
-  heroVideo.addEventListener('loadedmetadata', () => resumeHero(false), { once: true });
-  heroVideo.addEventListener('canplay', () => resumeHero(false), { once: true });
-  heroVideo.addEventListener('ended', () => resumeHero(true));
+  const heroSection = heroVideo.closest('.hero');
+  if ('IntersectionObserver' in window && heroSection) {
+    const observer = new IntersectionObserver((entries) => {
+      heroVisible = Boolean(entries[0]?.isIntersecting);
+      if (heroVisible) scheduleHeroResume(40);
+      else heroVideo.pause();
+    }, { threshold: 0.02 });
+    observer.observe(heroSection);
+  }
+
+  heroVideo.addEventListener('loadedmetadata', () => scheduleHeroResume(20), { once: true });
+  heroVideo.addEventListener('canplay', () => scheduleHeroResume(20));
+  heroVideo.addEventListener('playing', () => { lastRenderedFrameAt = performance.now(); });
+  heroVideo.addEventListener('ended', () => scheduleHeroResume(20));
   heroVideo.addEventListener('pause', () => {
-    if (heroCanPlay() && !heroVideo.ended) scheduleHeroResume(240);
+    if (heroCanPlay() && !heroVideo.ended) scheduleHeroResume(120);
   });
+  heroVideo.addEventListener('stalled', () => scheduleHeroResume(180));
+
+  // requestVideoFrameCallback lets us detect the iOS/WKWebView case where the
+  // media element reports "playing" but its composited video frame stops updating.
+  if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+    const trackFrame = () => {
+      lastRenderedFrameAt = performance.now();
+      heroVideo.requestVideoFrameCallback(trackFrame);
+    };
+    heroVideo.requestVideoFrameCallback(trackFrame);
+
+    window.setInterval(() => {
+      if (!heroCanPlay() || heroVideo.paused || heroVideo.readyState < 2) return;
+      if (performance.now() - lastRenderedFrameAt > 2400) nudgeHeroDecoder();
+    }, 900);
+  } else {
+    // Older webviews: only recover from an actual paused state.
+    window.setInterval(() => {
+      if (heroCanPlay() && heroVideo.paused) resumeHero(false);
+    }, 1200);
+  }
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !modal?.open) scheduleHeroResume(80);
+    if (!document.hidden && !modal?.open) scheduleHeroResume(40);
   });
-  window.addEventListener('pageshow', () => scheduleHeroResume(80));
-  window.addEventListener('focus', () => scheduleHeroResume(120));
-  document.addEventListener('touchstart', () => {
-    if (heroCanPlay() && heroVideo.paused) resumeHero(false);
-  }, { passive: true });
+  window.addEventListener('pageshow', () => scheduleHeroResume(40));
+  window.addEventListener('focus', () => scheduleHeroResume(60));
+
+  // A real user gesture gives restrictive in-app browsers another chance to
+  // authorize inline playback without exposing an extra play button.
+  ['pointerdown', 'touchstart'].forEach((eventName) => {
+    document.addEventListener(eventName, () => {
+      if (heroCanPlay()) resumeHero(false);
+    }, { passive: true });
+  });
 
   resumeHero(false);
 }
+
+// The trailer preview deliberately stays poster-only. Running two autoplaying
+// videos at once can make iOS suspend the fullscreen hero after its first frames.
+trailerPreview?.pause();
 
 function openTrailer() {
   if (!modal || !modalVideo) return;
@@ -116,8 +173,7 @@ function closeTrailer() {
   modalVideo?.pause();
   if (typeof modal.close === 'function') modal.close();
   else modal.removeAttribute('open');
-  scheduleHeroResume(60);
-  trailerPreview?.play().catch(() => {});
+  scheduleHeroResume(40);
 }
 
 openTrailerButtons.forEach((button) => button.addEventListener('click', openTrailer));
@@ -134,6 +190,5 @@ modal?.addEventListener('cancel', (event) => {
 
 modal?.addEventListener('close', () => {
   modalVideo?.pause();
-  scheduleHeroResume(60);
-  trailerPreview?.play().catch(() => {});
+  scheduleHeroResume(40);
 });
