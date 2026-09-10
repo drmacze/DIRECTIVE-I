@@ -1,4 +1,12 @@
 (() => {
+  if (!document.querySelector('script[data-directive-official-branding]')) {
+    const branding = document.createElement('script');
+    branding.src = 'official-branding.js?v=1';
+    branding.dataset.directiveOfficialBranding = '';
+    branding.defer = true;
+    document.head.appendChild(branding);
+  }
+
   const button = document.querySelector('[data-minecraft-login]');
   const status = document.querySelector('[data-minecraft-auth-status]');
   const profile = document.querySelector('[data-minecraft-profile]');
