@@ -1,7 +1,6 @@
 (() => {
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const lines = Array.from(document.querySelectorAll('[data-core-line]'));
-  const finalLine = document.querySelector('[data-core-final]');
   const scrollHint = document.querySelector('[data-scroll-hint]');
   const track = document.querySelector('[data-core-track]');
   const handoff = document.querySelector('[data-docs-handoff]');
@@ -38,17 +37,13 @@
   }
 
   function renderScrollHint() {
-    if (!scrollHint || !finalLine || !handoff || committed) {
+    if (!scrollHint || !handoff || committed) {
       scrollHint?.classList.remove('is-visible');
       return;
     }
 
-    const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
-    const rect = finalLine.getBoundingClientRect();
     const docsStarted = window.scrollY >= handoff.offsetTop + 2;
-    const finalLineNear = rect.top < viewport * .88 && rect.bottom > viewport * .08;
-
-    scrollHint.classList.toggle('is-visible', finalLineNear && !docsStarted);
+    scrollHint.classList.toggle('is-visible', !docsStarted);
   }
 
   function stopLenis() {
