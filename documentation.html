@@ -9,37 +9,47 @@
   <meta name="description" content="DIRECTIVE I documentation." />
   <title>DIRECTIVE I — Documentation</title>
   <script src="entry-gate.js?v=1"></script>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="lightswind-effects.css?v=2" />
-  <link rel="stylesheet" href="documentation.css?v=1" />
+  <link rel="stylesheet" href="documentation.css?v=2" />
 </head>
-<body class="docs-page site-page">
-  <header class="docs-header">
-    <a class="brand" href="index.html" aria-label="DIRECTIVE I home"><span class="brand-word">DIRECTIVE</span><span class="brand-mark">I</span></a>
-    <a class="docs-home" href="index.html">Home <span>↗</span></a>
-  </header>
-
+<body class="docs-page">
   <main class="docs-main">
     <section class="docs-hero">
-      <p class="docs-kicker">SYSTEM ARCHIVE / DOCUMENTATION</p>
+      <p class="docs-kicker">SYSTEM ARCHIVE</p>
       <h1>Documentation.</h1>
-      <p class="docs-copy">Technical and gameplay reference for the systems that define DIRECTIVE I.</p>
     </section>
 
     <section class="docs-grid" aria-label="Documentation sections">
-      <a class="docs-card" href="core-gameplay.html">
-        <div class="docs-card-index">01</div>
-        <div class="docs-card-copy">
-          <small>Gameplay architecture</small>
+      <a class="docs-row" href="core-gameplay.html">
+        <span class="docs-row-index">01</span>
+        <div class="docs-row-copy">
+          <small>Feature</small>
           <h2>Core Gameplay</h2>
-          <p>Combat, physics, AI, movement, rendering, survival, VFX, vehicles, military systems, world design, and campaign systems.</p>
         </div>
-        <span class="docs-card-arrow" aria-hidden="true">↗</span>
       </a>
+
+      <article class="docs-row docs-row-static">
+        <span class="docs-row-index">02</span>
+        <div class="docs-row-copy">
+          <small>System</small>
+          <h2>DIRECTIVE I</h2>
+        </div>
+      </article>
     </section>
   </main>
 
-  <script src="lightswind-effects.js?v=1"></script>
-  <script src="music-player.js?v=8"></script>
+  <script>
+    (() => {
+      try {
+        if (new URLSearchParams(location.search).get('from') === 'core') {
+          history.replaceState(null, '', 'documentation.html');
+          sessionStorage.removeItem('directive_docs_handoff');
+        }
+      } catch (_) {}
+      const script=document.createElement('script');
+      script.src='music-player.js?v=8';
+      script.onload=()=>{const w=document.querySelector('.directive-music-wrap');if(w)w.style.display='none'};
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
