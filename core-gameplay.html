@@ -9,10 +9,10 @@
   <meta name="description" content="DIRECTIVE I core gameplay systems." />
   <title>DIRECTIVE I — Core Gameplay</title>
   <script src="entry-gate.js?v=1"></script>
-  <link rel="stylesheet" href="core-gameplay.css?v=2" />
+  <link rel="stylesheet" href="core-gameplay.css?v=3" />
 </head>
 <body>
-  <main class="core-scroll" aria-label="Core gameplay features">
+  <main class="core-scroll" aria-label="Core gameplay features" data-core-content>
     <div class="core-track" data-core-track>
       <p class="core-line" data-core-line>Tactical combat</p>
       <p class="core-line" data-core-line>Real Physics</p>
@@ -35,28 +35,31 @@
     </div>
   </main>
 
-  <section class="docs-handoff" data-docs-handoff aria-label="Return to Documentation">
-    <div class="docs-handoff-page" data-docs-handoff-page>
-      <main class="handoff-main">
-        <section class="handoff-hero">
-          <p class="handoff-kicker">SYSTEM ARCHIVE</p>
-          <h2>Documentation.</h2>
-        </section>
-        <section class="handoff-grid" aria-label="Documentation sections">
-          <div class="handoff-row">
-            <span>01</span>
-            <div><small>Feature</small><strong>Core Gameplay</strong></div>
-          </div>
-          <div class="handoff-row">
-            <span>02</span>
-            <div><small>System</small><strong>DIRECTIVE I</strong></div>
-          </div>
-        </section>
-      </main>
+  <section class="docs-handoff" data-docs-handoff aria-label="Documentation">
+    <div class="docs-handoff-sticky">
+      <div class="docs-handoff-page" data-docs-handoff-page>
+        <main class="handoff-main">
+          <section class="handoff-hero">
+            <p class="handoff-kicker">SYSTEM ARCHIVE</p>
+            <h2>Documentation.</h2>
+          </section>
+
+          <section class="handoff-grid" aria-label="Documentation sections">
+            <a class="handoff-row" href="core-gameplay.html">
+              <span>01</span>
+              <div><small>Feature</small><strong>Core Gameplay</strong></div>
+            </a>
+            <article class="handoff-row handoff-row-static">
+              <span>02</span>
+              <div><small>System</small><strong>DIRECTIVE I</strong></div>
+            </article>
+          </section>
+        </main>
+      </div>
     </div>
   </section>
 
-  <script src="core-gameplay.js?v=2"></script>
+  <script src="core-gameplay.js?v=3"></script>
   <script>
     (() => {
       const script=document.createElement('script');
