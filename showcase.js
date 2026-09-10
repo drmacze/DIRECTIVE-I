@@ -8,6 +8,7 @@
   const modelObjectUrls=new Map();
   let modelViewerPromise=null;
 
+  const meta=entry=>entry?.metadata&&typeof entry.metadata==='object'?entry.metadata:{};
   const empty=(root,title,copy='Content will appear here when published from the developer console.')=>{
     if(!root)return;
     root.replaceChildren();
@@ -66,15 +67,24 @@
     return modelViewerPromise;
   }
 
-  function hasEmbeddedModel(entry){
-    const metadata=entry?.metadata&&typeof entry.metadata==='object'?entry.metadata:{};
+  function getSketchfabUid(entry){
+    const uid=String(meta(entry).sketchfab_uid||'').trim();
+    return /^[a-f0-9]{32}$/i.test(uid)?uid:'';
+  }
+
+  function hasGlb(entry){
+    const metadata=meta(entry);
     return Array.isArray(metadata.model_base64_parts)||typeof metadata.model_base64==='string'||metadata.embedded_model===true||/\.(glb|gltf)(?:[?#]|$)/i.test(entry?.asset_url||'');
+  }
+
+  function hasInteractiveModel(entry){
+    return !!getSketchfabUid(entry)||hasGlb(entry);
   }
 
   function decodeEmbeddedModel(entry){
     const id=String(entry?.id||entry?.title||Math.random());
     if(modelObjectUrls.has(id))return modelObjectUrls.get(id);
-    const metadata=entry?.metadata&&typeof entry.metadata==='object'?entry.metadata:{};
+    const metadata=meta(entry);
     let encoded='';
     if(Array.isArray(metadata.model_base64_parts))encoded=metadata.model_base64_parts.join('');
     else if(typeof metadata.model_base64==='string')encoded=metadata.model_base64;
@@ -90,6 +100,22 @@
       console.warn('DIRECTIVE I embedded model decode failed',entry?.title,error);
       return entry?.asset_url||'';
     }
+  }
+
+  function makeLoading(label){
+    const loading=document.createElement('div');
+    loading.className='model-loading';
+    const strong=document.createElement('strong');
+    strong.textContent=`LOADING ${label}`;
+    const span=document.createElement('span');
+    span.textContent='Preparing original asset…';
+    loading.append(strong,span);
+    return {loading,strong,span};
+  }
+
+  function hideLoading(loading,delay=250){
+    loading.classList.add('is-hidden');
+    setTimeout(()=>loading.remove(),350+delay);
   }
 
   function updateSlider(name){
@@ -129,44 +155,67 @@
     window.addEventListener('resize',()=>sliderState.forEach((_,name)=>updateSlider(name)),{passive:true});
   }
 
-  function createViewer(entry,label='PROPERTY'){
+  function createSketchfabViewer(entry,label){
+    const uid=getSketchfabUid(entry);
+    const iframe=document.createElement('iframe');
+    iframe.className='source-model-viewer';
+    iframe.title=entry.title||`DIRECTIVE I ${label.toLowerCase()}`;
+    iframe.loading='lazy';
+    iframe.allow='autoplay; fullscreen; xr-spatial-tracking';
+    iframe.allowFullscreen=true;
+    iframe.referrerPolicy='strict-origin-when-cross-origin';
+    const params=new URLSearchParams({
+      autostart:'1',preload:'1',ui_theme:'dark',ui_infos:'0',ui_help:'0',ui_settings:'0',
+      ui_inspector:'0',ui_vr:'0',ui_ar:'0',ui_fullscreen:'0',ui_annotations:'0',
+      ui_watermark:'0',ui_watermark_link:'0',ui_stop:'0',ui_hint:'0',dnt:'1'
+    });
+    iframe.src=`https://sketchfab.com/models/${uid}/embed?${params}`;
+    const {loading,strong,span}=makeLoading(label);
+    strong.textContent=`LOADING ORIGINAL ${label}`;
+    span.textContent='Geometry · UV · Materials · Textures';
+    iframe.addEventListener('load',()=>{
+      hideLoading(loading,650);
+      window.DIRECTIVE_ANALYTICS?.track?.('showcase_source_model_load',{id:entry.id,title:entry.title,kind:entry.kind});
+    },{once:true});
+    return {viewer:iframe,loading,usesModelViewer:false};
+  }
+
+  function createGlbViewer(entry,label){
     const viewer=document.createElement('model-viewer');
     viewer.src=decodeEmbeddedModel(entry);
     viewer.alt=entry.description||entry.title||`DIRECTIVE I ${label.toLowerCase()} model`;
     viewer.setAttribute('camera-controls','');
     viewer.setAttribute('touch-action','pan-y');
-    viewer.setAttribute('shadow-intensity','1');
+    viewer.setAttribute('shadow-intensity','1.15');
     viewer.setAttribute('environment-image','neutral');
-    viewer.setAttribute('interaction-prompt','auto');
+    viewer.setAttribute('interaction-prompt','none');
     viewer.setAttribute('loading','eager');
     viewer.setAttribute('reveal','auto');
+    viewer.setAttribute('camera-orbit','35deg 67deg auto');
+    viewer.setAttribute('field-of-view','30deg');
+    viewer.setAttribute('min-field-of-view','18deg');
+    viewer.setAttribute('max-field-of-view','50deg');
     if(entry.thumbnail_url)viewer.setAttribute('poster',entry.thumbnail_url);
-    if(!reduceMotion)viewer.setAttribute('auto-rotate','');
 
-    const loading=document.createElement('div');
-    loading.className='model-loading';
-    const loadingStrong=document.createElement('strong');
-    loadingStrong.textContent=`LOADING ${label}`;
-    const loadingText=document.createElement('span');
-    loadingText.textContent='0%';
-    loading.append(loadingStrong,loadingText);
-
+    const {loading,strong,span}=makeLoading(label);
+    span.textContent='0%';
     viewer.addEventListener('progress',event=>{
       const progress=Math.max(0,Math.min(1,Number(event?.detail?.totalProgress||0)));
-      loadingText.textContent=`${Math.round(progress*100)}%`;
+      span.textContent=`${Math.round(progress*100)}%`;
     });
-    viewer.addEventListener('load',()=>{
-      loading.classList.add('is-hidden');
-      setTimeout(()=>loading.remove(),350);
-    },{once:true});
+    viewer.addEventListener('load',()=>hideLoading(loading),{once:true});
     viewer.addEventListener('error',()=>{
       loading.classList.remove('is-hidden');
       loading.classList.add('is-error');
-      loadingStrong.textContent=`${label} FAILED TO LOAD`;
-      loadingText.textContent='Tap reload or try again.';
+      strong.textContent=`${label} FAILED TO LOAD`;
+      span.textContent='Reload this page to retry.';
     });
     viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title,kind:entry.kind}),{once:true});
-    return {viewer,loading};
+    return {viewer,loading,usesModelViewer:true};
+  }
+
+  function createInteractiveViewer(entry,label='PROPERTY'){
+    return getSketchfabUid(entry)?createSketchfabViewer(entry,label):createGlbViewer(entry,label);
   }
 
   function createModelCard(entry,index){
@@ -175,7 +224,8 @@
     card.dataset.entryId=entry.id||'';
     const media=document.createElement('div');
     media.className='model-card-view';
-    const {viewer,loading}=createViewer(entry,'PROPERTY');
+    if(getSketchfabUid(entry))media.classList.add('is-source-viewer');
+    const {viewer,loading}=createInteractiveViewer(entry,'PROPERTY');
     media.append(viewer,loading);
 
     const copy=document.createElement('div');
@@ -202,16 +252,18 @@
     if(!models.length){empty(modelTrack,'PROPERTY ARCHIVE');updateSlider('models');return}
     models.forEach((entry,index)=>modelTrack.appendChild(createModelCard(entry,index)));
     updateSlider('models');
-    ensureModelViewer().then(ready=>{
-      if(ready)return;
-      modelTrack.querySelectorAll('.model-loading').forEach(loading=>{
-        loading.classList.add('is-error');
-        const strong=loading.querySelector('strong');
-        const span=loading.querySelector('span');
-        if(strong)strong.textContent='3D VIEWER UNAVAILABLE';
-        if(span)span.textContent='Viewer library could not be loaded.';
+    if(models.some(entry=>!getSketchfabUid(entry)&&hasGlb(entry))){
+      ensureModelViewer().then(ready=>{
+        if(ready)return;
+        modelTrack.querySelectorAll('.model-loading').forEach(loading=>{
+          loading.classList.add('is-error');
+          const strong=loading.querySelector('strong');
+          const span=loading.querySelector('span');
+          if(strong)strong.textContent='3D VIEWER UNAVAILABLE';
+          if(span)span.textContent='Viewer library could not be loaded.';
+        });
       });
-    });
+    }
   }
 
   function renderImages(images){
@@ -241,19 +293,19 @@
     if(!itemTrack)return;
     itemTrack.replaceChildren();
     if(!items.length){empty(itemTrack,'ITEM ARCHIVE READY');updateSlider('items');return}
-    let has3d=false;
+    let needsModelViewer=false;
     items.forEach((entry,index)=>{
       const card=document.createElement('article');
       card.className='item-card';
       const media=document.createElement('div');
       media.className='item-media';
 
-      if(hasEmbeddedModel(entry)){
-        has3d=true;
-        media.style.position='relative';
-        const {viewer,loading}=createViewer(entry,'PROJECT ITEM');
-        viewer.style.cssText='display:block;width:100%;height:100%;min-height:260px;background:transparent;';
-        media.append(viewer,loading);
+      if(hasInteractiveModel(entry)){
+        media.classList.add('item-media-3d');
+        if(getSketchfabUid(entry))media.classList.add('is-source-viewer');
+        const result=createInteractiveViewer(entry,'PROJECT ITEM');
+        needsModelViewer=needsModelViewer||result.usesModelViewer;
+        media.append(result.viewer,result.loading);
       }else{
         const img=document.createElement('img');
         img.src=entry.thumbnail_url||entry.asset_url;
@@ -278,7 +330,7 @@
       itemTrack.appendChild(card);
     });
     updateSlider('items');
-    if(has3d)ensureModelViewer();
+    if(needsModelViewer)ensureModelViewer();
   }
 
   async function load(){
@@ -290,7 +342,8 @@
       renderModels(entries.filter(x=>x.kind==='model'));
       renderImages(entries.filter(x=>x.kind==='image'));
       renderItems(entries.filter(x=>x.kind==='item'));
-    }catch(_){
+    }catch(error){
+      console.warn('DIRECTIVE I Showcase unavailable',error);
       renderModels([]);
       if(frameTrack){
         frameTrack.innerHTML='<figure class="frame-card"><img src="assets/directive-i-hero-poster.jpg" alt="DIRECTIVE I cinematic project frame"><figcaption><span>World / Atmosphere</span><span>01</span></figcaption></figure><figure class="frame-card"><img src="assets/directive-i-trailer-poster.jpg" alt="DIRECTIVE I trailer project frame"><figcaption><span>Transmission / Scene</span><span>02</span></figcaption></figure>';
