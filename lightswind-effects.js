@@ -1,4 +1,12 @@
 (() => {
+  if (!window.DIRECTIVE_ANALYTICS && !document.querySelector('script[data-directive-analytics]')) {
+    const analytics = document.createElement('script');
+    analytics.src = 'site-analytics.js?v=1';
+    analytics.defer = true;
+    analytics.dataset.directiveAnalytics = '1';
+    document.head.appendChild(analytics);
+  }
+
   const PHRASE = /DIRECTIVE\s+I(?!I)/gi;
   const SKIP = new Set(['SCRIPT','STYLE','NOSCRIPT','SVG','CANVAS','TEXTAREA','OPTION']);
 
