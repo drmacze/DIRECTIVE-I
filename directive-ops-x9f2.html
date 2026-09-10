@@ -72,9 +72,9 @@
               <label>Description<textarea rows="4" maxlength="4000" data-entry-description></textarea></label>
               <label>Asset URL<input type="url" data-entry-url required /></label>
               <label>Thumbnail URL<input type="url" data-entry-thumb /></label>
-              <div class="upload-box"><div><strong>Upload asset</strong><span>Images, GLB/GLTF, MP4/MOV up to 50 MB</span></div><input type="file" data-upload-file accept="image/*,.glb,.gltf,video/mp4,video/quicktime" /><button type="button" data-upload>Upload</button><span data-upload-status></span></div>
+              <div class="upload-box"><div><strong>Upload asset</strong><span>Images, GLB/GLTF, MP4/MOV up to 50 MB. Uploads are saved to Showcase automatically.</span></div><input type="file" data-upload-file accept="image/*,.glb,.gltf,video/mp4,video/quicktime" /><button type="button" data-upload>Upload</button><span data-upload-status></span></div>
               <label class="switch-line"><input type="checkbox" checked data-entry-published /> Publish on Showcase</label>
-              <button class="primary" type="submit">Save entry</button>
+              <button class="primary" type="submit">Save changes</button>
               <p class="ops-error" data-editor-error></p>
             </form>
           </article>
@@ -93,6 +93,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="directive-ops.js?v=1"></script>
+  <script src="directive-ops.js?v=2"></script>
 </body>
 </html>
