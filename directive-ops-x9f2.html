@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050707" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <title>DIRECTIVE I — Operations Console</title>
+  <link rel="stylesheet" href="directive-ops.css?v=1" />
+</head>
+<body>
+  <main class="ops-auth" data-auth>
+    <section class="ops-auth-card">
+      <p class="ops-kicker">RESTRICTED SYSTEM</p>
+      <h1>Developer<br/>Console.</h1>
+      <p class="ops-muted">Authorized DIRECTIVE I operators only.</p>
+      <form data-login-form>
+        <label>Console PIN<input type="password" inputmode="numeric" autocomplete="current-password" data-pin required /></label>
+        <button type="submit">Unlock console</button>
+        <p class="ops-error" data-login-error></p>
+      </form>
+    </section>
+  </main>
+
+  <div class="ops-app" data-app hidden>
+    <aside class="ops-sidebar">
+      <div class="ops-brand">DIRECTIVE <b>I</b></div>
+      <nav>
+        <button class="is-active" data-view-button="dashboard">Dashboard</button>
+        <button data-view-button="showcase">Showcase</button>
+        <button data-view-button="security">Security</button>
+      </nav>
+      <button class="ops-logout" data-logout>Log out</button>
+    </aside>
+
+    <header class="ops-mobile-bar">
+      <span>DIRECTIVE <b>I</b></span>
+      <select data-mobile-view><option value="dashboard">Dashboard</option><option value="showcase">Showcase</option><option value="security">Security</option></select>
+      <button data-logout-mobile>Exit</button>
+    </header>
+
+    <main class="ops-main">
+      <section class="ops-view" data-view="dashboard">
+        <div class="ops-heading"><div><p class="ops-kicker">SITE INTELLIGENCE</p><h2>Dashboard</h2></div><button data-refresh-dashboard>Refresh</button></div>
+        <div class="stats-grid" data-stats-grid></div>
+        <div class="ops-grid two">
+          <article class="ops-panel"><div class="panel-head"><h3>14-day traffic</h3><span>Views / visitors</span></div><div class="traffic-chart" data-traffic-chart></div></article>
+          <article class="ops-panel"><div class="panel-head"><h3>Top pages</h3><span>Last 30 days</span></div><div class="metric-list" data-top-pages></div></article>
+        </div>
+        <div class="ops-grid three">
+          <article class="ops-panel"><div class="panel-head"><h3>Devices</h3></div><div class="metric-list" data-devices></div></article>
+          <article class="ops-panel"><div class="panel-head"><h3>Browsers</h3></div><div class="metric-list" data-browsers></div></article>
+          <article class="ops-panel"><div class="panel-head"><h3>Operating systems</h3></div><div class="metric-list" data-os></div></article>
+        </div>
+        <div class="ops-grid two">
+          <article class="ops-panel"><div class="panel-head"><h3>Referrers</h3><span>Last 30 days</span></div><div class="metric-list" data-referrers></div></article>
+          <article class="ops-panel"><div class="panel-head"><h3>Event activity</h3></div><div class="metric-list" data-event-types></div></article>
+        </div>
+      </section>
+
+      <section class="ops-view" data-view="showcase" hidden>
+        <div class="ops-heading"><div><p class="ops-kicker">CONTENT CONTROL</p><h2>Showcase</h2></div><button data-new-showcase>New entry</button></div>
+        <div class="showcase-admin-layout">
+          <article class="ops-panel showcase-list-panel"><div class="panel-head"><h3>Published content</h3><span data-showcase-count></span></div><div class="admin-list" data-showcase-list></div></article>
+          <article class="ops-panel editor-panel">
+            <div class="panel-head"><h3 data-editor-title>New showcase entry</h3><button class="danger-link" type="button" data-delete-entry hidden>Delete</button></div>
+            <form class="editor-form" data-showcase-form>
+              <input type="hidden" data-entry-id />
+              <div class="form-row"><label>Type<select data-entry-kind><option value="image">Image</option><option value="model">3D Model</option><option value="item">Project Item</option></select></label><label>Sort order<input type="number" min="0" max="9999" value="100" data-entry-sort /></label></div>
+              <label>Title<input maxlength="120" data-entry-title required /></label>
+              <label>Subtitle<input maxlength="180" data-entry-subtitle /></label>
+              <label>Description<textarea rows="4" maxlength="4000" data-entry-description></textarea></label>
+              <label>Asset URL<input type="url" data-entry-url required /></label>
+              <label>Thumbnail URL<input type="url" data-entry-thumb /></label>
+              <div class="upload-box"><div><strong>Upload asset</strong><span>Images, GLB/GLTF, MP4/MOV up to 50 MB</span></div><input type="file" data-upload-file accept="image/*,.glb,.gltf,video/mp4,video/quicktime" /><button type="button" data-upload>Upload</button><span data-upload-status></span></div>
+              <label class="switch-line"><input type="checkbox" checked data-entry-published /> Publish on Showcase</label>
+              <button class="primary" type="submit">Save entry</button>
+              <p class="ops-error" data-editor-error></p>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="ops-view" data-view="security" hidden>
+        <div class="ops-heading"><div><p class="ops-kicker">ACCESS CONTROL</p><h2>Security</h2></div></div>
+        <div class="ops-grid two">
+          <article class="ops-panel"><h3>Console protection</h3><p class="ops-muted">This route is not linked from the public site and is excluded from search indexing. Dashboard and Showcase mutations require a short-lived server-verified console session.</p></article>
+          <article class="ops-panel"><h3>Session</h3><p class="ops-muted" data-session-status>Verified console session active.</p><button data-security-logout>Revoke this session</button></article>
+        </div>
+        <article class="ops-panel"><div class="panel-head"><h3>Recent console activity</h3></div><div class="audit-list" data-audit-list></div></article>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="directive-ops.js?v=1"></script>
+</body>
+</html>
