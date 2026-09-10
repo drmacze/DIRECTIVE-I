@@ -1,0 +1,165 @@
+/* DIRECTIVE I motion accents inspired by the lightweight gradient treatment used on Lightswind UI.
+   Kept self-contained, green-led, and GPU-friendly for mobile/iOS. */
+:root{
+  --directive-neon:#70e224;
+  --directive-lime:#b8ff66;
+  --directive-mint:#55f3a4;
+  --directive-cyan:#5de7d7;
+  --directive-ice:#eaffdf;
+}
+
+.directive-shiny-text,
+.directive-shiny-split{
+  display:inline-block;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent;
+  background-image:linear-gradient(110deg,
+    #f3f6f3 0%,
+    #f3f6f3 32%,
+    #a9ff72 42%,
+    #f4ffe9 49%,
+    #70e224 56%,
+    #c8ff9d 63%,
+    #f3f6f3 72%,
+    #f3f6f3 100%);
+  background-size:260% 100%;
+  background-position:135% 0;
+  -webkit-background-clip:text;
+  background-clip:text;
+  animation:directive-shiny-sweep 5.2s cubic-bezier(.35,0,.25,1) infinite;
+  will-change:background-position;
+}
+
+.directive-shiny-mark{
+  background-image:linear-gradient(110deg,
+    #70e224 0%,
+    #70e224 30%,
+    #d9ffc4 44%,
+    #ffffff 50%,
+    #a7ff62 57%,
+    #70e224 70%,
+    #70e224 100%);
+  filter:drop-shadow(0 0 9px rgba(112,226,36,.16));
+}
+
+@keyframes directive-shiny-sweep{
+  0%,18%{background-position:135% 0}
+  58%,100%{background-position:-120% 0}
+}
+
+/* HOME / green-spectrum aurora accents */
+.hero-meta,
+.feature-strip,
+.trailer-card,
+.intel-card{
+  position:relative;
+}
+
+.hero-meta::before,
+.feature-strip::before,
+.trailer-card::after,
+.intel-card::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  background:linear-gradient(90deg,
+    transparent,
+    rgba(112,226,36,.15),
+    rgba(184,255,102,.78),
+    rgba(85,243,164,.68),
+    rgba(93,231,215,.48),
+    rgba(112,226,36,.72),
+    transparent);
+  background-size:240% 100%;
+  animation:directive-spectrum-flow 6.5s linear infinite;
+}
+
+.hero-meta::before{
+  left:8%;right:8%;top:-1px;height:1px;
+  opacity:.72;
+  box-shadow:0 0 18px rgba(112,226,36,.16);
+}
+
+.feature-strip::before{
+  left:0;right:0;top:0;height:1px;
+  opacity:.88;
+  box-shadow:0 0 24px rgba(112,226,36,.18);
+}
+
+.trailer-card::after{
+  left:10%;right:10%;bottom:-1px;height:2px;
+  opacity:.8;
+  filter:blur(.2px);
+  box-shadow:0 0 22px rgba(85,243,164,.22);
+}
+
+.intel-card::after{
+  left:8%;right:8%;bottom:-1px;height:2px;
+  opacity:.66;
+  filter:blur(.3px);
+  box-shadow:0 0 28px rgba(112,226,36,.18);
+}
+
+.kicker::after,
+.story-label::after,
+.welcome-kicker::after{
+  content:"";
+  display:inline-block;
+  width:38px;
+  height:1px;
+  margin-left:10px;
+  vertical-align:middle;
+  background:linear-gradient(90deg,#70e224,#b8ff66,#55f3a4,#5de7d7,#70e224);
+  background-size:220% 100%;
+  animation:directive-spectrum-flow 4.8s linear infinite;
+  box-shadow:0 0 12px rgba(112,226,36,.2);
+}
+
+/* A restrained blurred aurora behind selected home sections. */
+.overview-section::after,
+.systems-section::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  width:min(560px,70vw);
+  height:120px;
+  border-radius:50%;
+  background:linear-gradient(90deg,
+    rgba(112,226,36,.16),
+    rgba(184,255,102,.09),
+    rgba(85,243,164,.13),
+    rgba(93,231,215,.08),
+    rgba(112,226,36,.14));
+  background-size:220% 100%;
+  filter:blur(54px);
+  opacity:.34;
+  z-index:0;
+  animation:directive-spectrum-flow 10s linear infinite;
+}
+
+.overview-section,
+.systems-section{position:relative;isolation:isolate}
+.overview-section::after{right:-12%;top:18%}
+.systems-section::after{left:-14%;bottom:16%}
+.overview-section>.page-shell,
+.systems-section>.page-shell{position:relative;z-index:1}
+
+@keyframes directive-spectrum-flow{
+  from{background-position:0% 50%}
+  to{background-position:220% 50%}
+}
+
+@media(max-width:620px){
+  .overview-section::after,.systems-section::after{width:82vw;height:84px;filter:blur(42px);opacity:.26}
+  .kicker::after,.story-label::after,.welcome-kicker::after{width:28px;margin-left:8px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .directive-shiny-text,.directive-shiny-split,
+  .hero-meta::before,.feature-strip::before,.trailer-card::after,.intel-card::after,
+  .kicker::after,.story-label::after,.welcome-kicker::after,
+  .overview-section::after,.systems-section::after{
+    animation:none!important;
+    background-position:50% 50%!important;
+  }
+}
