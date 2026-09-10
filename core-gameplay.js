@@ -1,12 +1,15 @@
 (() => {
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const lines = Array.from(document.querySelectorAll('[data-core-line]'));
-  const navButton = document.querySelector('[data-core-nav]');
-  const navPanel = document.querySelector('[data-core-nav-panel]');
-
+  const track = document.querySelector('[data-core-track]');
+  const handoff = document.querySelector('[data-docs-handoff]');
+  const handoffPage = document.querySelector('[data-docs-handoff-page]');
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-  function render() {
+  let routed = false;
+  let raf = 0;
+
+  function renderLines() {
     if (reduceMotion) return;
     const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
     const center = viewport * .5;
@@ -17,7 +20,6 @@
       const distance = (lineCenter - center) / viewport;
       const abs = Math.abs(distance);
       const focus = 1 - clamp(abs / .74, 0, 1);
-
       const rotateX = clamp(distance * -44, -42, 42);
       const translateZ = -120 + focus * 120;
       const translateY = distance * 34;
@@ -31,7 +33,38 @@
     });
   }
 
-  let raf = 0;
+  function renderHandoff() {
+    if (!handoff || !handoffPage) return;
+    const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
+    const rect = handoff.getBoundingClientRect();
+    const progress = clamp(1 - rect.top / viewport, 0, 1);
+    const eased = progress * progress * (3 - 2 * progress);
+    const y = (1 - eased) * 100;
+
+    handoffPage.style.transform = `translate3d(0,${y.toFixed(3)}%,0)`;
+    handoffPage.style.opacity = String(.72 + eased * .28);
+
+    if (track) {
+      track.style.opacity = String(1 - progress * .42);
+      track.style.filter = `blur(${(progress * 5).toFixed(2)}px)`;
+      track.style.transform = `translate3d(0,${(-progress * 18).toFixed(2)}px,0) scale(${(1 - progress * .012).toFixed(4)})`;
+    }
+
+    if (progress >= .997 && !routed) {
+      routed = true;
+      handoff.classList.add('is-complete');
+      try { sessionStorage.setItem('directive_docs_handoff', '1'); } catch (_) {}
+      window.setTimeout(() => {
+        window.location.replace('documentation.html?from=core');
+      }, reduceMotion ? 0 : 90);
+    }
+  }
+
+  function render() {
+    renderLines();
+    renderHandoff();
+  }
+
   const schedule = () => {
     if (raf) return;
     raf = requestAnimationFrame(() => {
@@ -40,28 +73,8 @@
     });
   };
 
-  if (!reduceMotion) {
-    render();
-    addEventListener('scroll', schedule, { passive: true });
-    addEventListener('resize', schedule, { passive: true });
-    addEventListener('pageshow', schedule);
-  }
-
-  const closeNav = () => {
-    navButton?.setAttribute('aria-expanded', 'false');
-    navPanel?.classList.remove('is-open');
-    navPanel?.setAttribute('aria-hidden', 'true');
-  };
-
-  navButton?.addEventListener('click', () => {
-    const open = navButton.getAttribute('aria-expanded') === 'true';
-    navButton.setAttribute('aria-expanded', String(!open));
-    navPanel?.classList.toggle('is-open', !open);
-    navPanel?.setAttribute('aria-hidden', String(open));
-  });
-
-  document.addEventListener('pointerdown', (event) => {
-    if (navButton?.contains(event.target) || navPanel?.contains(event.target)) return;
-    closeNav();
-  });
+  render();
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule, { passive: true });
+  addEventListener('pageshow', schedule);
 })();
