@@ -1,29 +1,38 @@
 (() => {
   const ASSETS = {
-    microsoft: 'https://msftstories.thesourcemediaassets.com/sites/52/2015/01/MS-logo.jpg',
-    xbox: 'https://xboxwire.thesourcemediaassets.com/sites/2/2026/05/Bootup_Wire-9c068aa206c9a72d2b1f.png',
+    microsoft: 'https://learn.microsoft.com/en-us/entra/identity-platform/media/howto-add-branding-in-apps/ms-symbollockup_mssymbol_19.svg',
+    xbox: 'https://education.minecraft.net/content/dam/education-edition/resources/images/edu-footer/MC-EDU_Footer-Image-0_Xbox-Game-Studios-Logo.svg',
     minecraft: 'https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/logos/HEGD-24_Parallax-B_Logo_430x.svg'
   };
 
   const style = document.createElement('style');
   style.id = 'directive-official-branding-style';
   style.textContent = `
-    .official-brand-strip{margin-top:16px;padding-top:13px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .official-brand-strip[data-compact="true"]{margin-top:12px;padding-top:11px;gap:8px}
+    .official-brand-strip{margin-top:18px;padding-top:17px;border-top:1px solid rgba(255,255,255,.09);display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-width:0}
+    .official-brand-strip[data-compact="true"]{margin-top:15px;padding-top:14px;gap:14px}
     .official-brand-label{width:100%;color:rgba(220,228,222,.48);font-size:7px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
-    .official-brand-link{height:34px;min-width:58px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.025);text-decoration:none;overflow:hidden;transition:border-color .2s ease,background .2s ease,transform .2s ease}
-    .official-brand-link:hover,.official-brand-link:focus-visible{border-color:rgba(112,226,36,.45);background:rgba(112,226,36,.055)}
+    .official-brand-link{display:flex;align-items:center;justify-content:center;border:0!important;background:transparent!important;padding:0!important;margin:0;text-decoration:none;overflow:visible;line-height:0;box-shadow:none!important;outline-offset:7px;transition:opacity .2s ease,transform .22s cubic-bezier(.16,1,.3,1)}
+    .official-brand-link:hover,.official-brand-link:focus-visible{background:transparent!important;opacity:.82;transform:translateY(-1px)}
     .official-brand-link:active{transform:scale(.98)}
-    .official-brand-link.microsoft{width:108px;background:#fff;padding:0 8px}.official-brand-link.microsoft img{display:block;width:92px;height:auto}
-    .official-brand-link.xbox{width:58px;background:#020303}.official-brand-link.xbox img{display:block;width:58px;height:33px;object-fit:cover}
-    .official-brand-link.minecraft{width:116px;padding:5px 9px;background:rgba(255,255,255,.94)}.official-brand-link.minecraft img{display:block;max-width:96px;max-height:23px;width:100%;height:auto}
-    .official-brand-note{margin-left:auto;color:rgba(222,230,224,.52);font-size:7px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-    .site-footer .official-brand-strip{grid-column:1/-1;margin-top:2px;padding-top:14px}
-    .player-profile-panel .official-brand-strip{margin-top:14px}
-    .login-sheet .official-brand-strip{margin-top:15px}
-    .lifecycle + .official-brand-strip{margin-top:20px}
-    .home-identity-card .official-brand-strip{margin:0;padding:13px 16px;border-top:1px solid rgba(255,255,255,.1)}
-    @media(max-width:620px){.official-brand-link{height:31px}.official-brand-link.microsoft{width:98px}.official-brand-link.microsoft img{width:82px}.official-brand-link.xbox{width:52px}.official-brand-link.xbox img{width:52px;height:30px}.official-brand-link.minecraft{width:104px}.official-brand-note{width:100%;margin-left:0;margin-top:2px}}
+    .official-brand-link img{display:block;width:auto;height:auto;object-fit:contain;background:transparent!important;border:0!important;box-shadow:none!important}
+    .official-brand-link.microsoft img{width:126px;max-height:38px}
+    .official-brand-link.xbox img{width:108px;max-height:46px}
+    .official-brand-link.minecraft img{width:150px;max-height:48px}
+    .official-brand-note{margin-left:auto;color:rgba(222,230,224,.46);font-size:7px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+    .site-footer .official-brand-strip{grid-column:1/-1;margin-top:7px;padding-top:20px}
+    .player-profile-panel .official-brand-strip{margin-top:16px}
+    .login-sheet .official-brand-strip{margin-top:16px}
+    .lifecycle + .official-brand-strip{margin-top:22px}
+    .home-identity-card .official-brand-strip{margin:0;padding:16px;border-top:1px solid rgba(255,255,255,.09)}
+    @media(max-width:620px){
+      .official-brand-strip{gap:14px}.official-brand-strip[data-compact="true"]{gap:11px}
+      .official-brand-link.microsoft img{width:102px;max-height:34px}
+      .official-brand-link.xbox img{width:88px;max-height:38px}
+      .official-brand-link.minecraft img{width:126px;max-height:40px}
+      .official-brand-note{width:100%;margin-left:0;margin-top:2px}
+      .site-footer .official-brand-strip{gap:16px;padding-top:18px}
+    }
+    @media(prefers-reduced-motion:reduce){.official-brand-link{transition:none}}
   `;
   document.head.appendChild(style);
 
@@ -33,54 +42,66 @@
     strip.dataset.compact = compact ? 'true' : 'false';
     strip.innerHTML = `
       <span class="official-brand-label">Identity & platform network</span>
-      <a class="official-brand-link microsoft" href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" aria-label="Microsoft official website"><img src="${ASSETS.microsoft}" alt="Microsoft" loading="lazy"></a>
-      <a class="official-brand-link xbox" href="https://www.xbox.com/" target="_blank" rel="noopener noreferrer" aria-label="Xbox official website"><img src="${ASSETS.xbox}" alt="Xbox" loading="lazy"></a>
-      <a class="official-brand-link minecraft" href="https://www.minecraft.net/" target="_blank" rel="noopener noreferrer" aria-label="Minecraft official website"><img src="${ASSETS.minecraft}" alt="Minecraft" loading="lazy"></a>
+      <a class="official-brand-link microsoft" href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" aria-label="Microsoft official website"><img src="${ASSETS.microsoft}" alt="Microsoft" loading="lazy" decoding="async"></a>
+      <a class="official-brand-link xbox" href="https://www.xbox.com/" target="_blank" rel="noopener noreferrer" aria-label="Xbox official website"><img src="${ASSETS.xbox}" alt="Xbox Game Studios" loading="lazy" decoding="async"></a>
+      <a class="official-brand-link minecraft" href="https://www.minecraft.net/" target="_blank" rel="noopener noreferrer" aria-label="Minecraft official website"><img src="${ASSETS.minecraft}" alt="Minecraft" loading="lazy" decoding="async"></a>
       <span class="official-brand-note">Unofficial fan project</span>`;
     return strip;
   };
 
+  const removeLegacyDuplicates = () => {
+    document.querySelectorAll('.directive-platform-strip,[data-official-brand-strip]').forEach(node => node.remove());
+  };
+
+  const ensureSingle = (host, compact, before = null) => {
+    if (!host) return null;
+    const existing = Array.from(host.children).filter(el => el.classList?.contains('official-brand-strip'));
+    const strip = existing.shift() || makeStrip(compact);
+    existing.forEach(el => el.remove());
+    if (!strip.parentElement) host.appendChild(strip);
+    if (before && before.parentElement === host && strip.previousElementSibling !== before) before.insertAdjacentElement('afterend', strip);
+    return strip;
+  };
+
   const install = () => {
-    let changed = false;
+    removeLegacyDuplicates();
 
     const loginWrap = document.querySelector('.minecraft-login-wrap');
-    if (loginWrap && !loginWrap.querySelector('.official-brand-strip')) {
-      loginWrap.appendChild(makeStrip(true));
-      changed = true;
-    }
+    if (loginWrap) ensureSingle(loginWrap, true);
 
     const lifecycle = document.querySelector('.lifecycle');
-    if (lifecycle && !lifecycle.parentElement?.querySelector(':scope > .official-brand-strip')) {
-      lifecycle.insertAdjacentElement('afterend', makeStrip(true));
-      changed = true;
+    if (lifecycle && lifecycle.parentElement) {
+      const host = lifecycle.parentElement;
+      let strip = Array.from(host.children).find(el => el.classList?.contains('official-brand-strip'));
+      if (!strip) {
+        strip = makeStrip(true);
+        lifecycle.insertAdjacentElement('afterend', strip);
+      }
     }
 
     const homeIdentity = document.querySelector('.home-identity-card');
-    if (homeIdentity && !homeIdentity.querySelector('.official-brand-strip')) {
-      homeIdentity.appendChild(makeStrip(true));
-      changed = true;
-    }
+    if (homeIdentity) ensureSingle(homeIdentity, true);
 
     const profilePanel = document.querySelector('.player-profile-panel');
-    if (profilePanel && !profilePanel.querySelector('.official-brand-strip')) {
+    if (profilePanel) {
       const logout = profilePanel.querySelector('[data-profile-logout],.player-profile-logout');
-      const strip = makeStrip(true);
-      if (logout) profilePanel.insertBefore(strip, logout);
-      else profilePanel.appendChild(strip);
-      changed = true;
+      let strip = Array.from(profilePanel.children).find(el => el.classList?.contains('official-brand-strip'));
+      if (!strip) strip = makeStrip(true);
+      if (!strip.parentElement) {
+        if (logout) profilePanel.insertBefore(strip, logout);
+        else profilePanel.appendChild(strip);
+      }
     }
 
     const footerGrid = document.querySelector('.site-footer .footer-grid');
-    if (footerGrid && !footerGrid.querySelector('.official-brand-strip')) {
-      footerGrid.appendChild(makeStrip(false));
-      changed = true;
+    if (footerGrid) {
+      const cookie = footerGrid.querySelector('[data-cookie-settings],.cookie-settings-trigger');
+      ensureSingle(footerGrid, false, cookie || null);
     }
-
-    return changed;
   };
 
   install();
-  const observer = new MutationObserver(() => install());
+  const observer = new MutationObserver(install);
   observer.observe(document.documentElement, { childList: true, subtree: true });
-  setTimeout(() => observer.disconnect(), 12000);
+  window.setTimeout(() => observer.disconnect(), 20000);
 })();
