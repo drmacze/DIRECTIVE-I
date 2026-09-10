@@ -9,9 +9,9 @@
   <meta name="description" content="DIRECTIVE I project showcase, 3D assets, project frames, and item archive." />
   <title>DIRECTIVE I — Showcase</title>
   <script src="entry-gate.js?v=1"></script>
-  <link rel="stylesheet" href="showcase.css?v=1" />
+  <link rel="stylesheet" href="showcase.css?v=2" />
 </head>
-<body data-showcase-model="">
+<body>
   <main class="showcase-shell">
     <header class="showcase-topbar">
       <a class="showcase-back" href="documentation.html">← Documentation</a>
@@ -26,60 +26,36 @@
 
     <section class="showcase-section reveal" aria-labelledby="model-title">
       <div class="section-head">
-        <div>
-          <p class="section-index">01 / 3D ARCHIVE</p>
-          <h2 class="section-title" id="model-title">3D Model</h2>
-        </div>
+        <div><p class="section-index">01 / 3D ARCHIVE</p><h2 class="section-title" id="model-title">3D Model</h2></div>
         <span class="section-meta">Drag · Rotate · Inspect</span>
       </div>
+      <div class="model-tabs" data-model-tabs></div>
       <div class="model-stage" data-model-stage>
-        <div class="model-empty" data-model-empty>
-          <strong>3D MODEL VIEWER</strong>
-          <span>Ready for GLB / GLTF project assets</span>
-        </div>
+        <div class="model-empty" data-model-empty><strong>3D MODEL VIEWER</strong><span>3D project assets will appear here.</span></div>
       </div>
     </section>
 
     <section class="showcase-section reveal" aria-labelledby="frames-title">
       <div class="section-head">
-        <div>
-          <p class="section-index">02 / PROJECT MEDIA</p>
-          <h2 class="section-title" id="frames-title">Project Frames</h2>
-        </div>
+        <div><p class="section-index">02 / PROJECT MEDIA</p><h2 class="section-title" id="frames-title">Project Frames</h2></div>
         <span class="section-meta">Cinematic archive</span>
       </div>
-      <div class="frame-grid">
-        <figure class="frame-card">
-          <img src="assets/directive-i-hero-poster.jpg" alt="DIRECTIVE I cinematic project frame" loading="lazy" />
-          <figcaption><span>World / Atmosphere</span><span>01</span></figcaption>
-        </figure>
-        <figure class="frame-card">
-          <img src="assets/directive-i-trailer-poster.jpg" alt="DIRECTIVE I trailer project frame" loading="lazy" />
-          <figcaption><span>Transmission / Scene</span><span>02</span></figcaption>
-        </figure>
-      </div>
+      <div class="frame-grid" data-frame-grid></div>
     </section>
 
     <section class="showcase-section reveal" aria-labelledby="items-title">
       <div class="section-head">
-        <div>
-          <p class="section-index">03 / ASSET ARCHIVE</p>
-          <h2 class="section-title" id="items-title">Project Items</h2>
-        </div>
+        <div><p class="section-index">03 / ASSET ARCHIVE</p><h2 class="section-title" id="items-title">Project Items</h2></div>
         <span class="section-meta">Weapons · Equipment · Props</span>
       </div>
-      <div class="items-empty">
-        <div>
-          <strong>ITEM ARCHIVE READY</strong>
-          <span>Item renders will appear here as project item assets are added.</span>
-        </div>
-      </div>
+      <div class="item-grid" data-item-grid></div>
     </section>
 
     <footer class="showcase-footer">DIRECTIVE I · Visual development archive</footer>
   </main>
 
-  <script src="showcase.js?v=1"></script>
+  <script src="site-analytics.js?v=1"></script>
+  <script src="showcase.js?v=2"></script>
   <script>
     (() => {
       const script=document.createElement('script');
