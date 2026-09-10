@@ -47,11 +47,10 @@
     if(customElements.get('model-viewer'))return Promise.resolve(true);
     if(modelViewerPromise)return modelViewerPromise;
     modelViewerPromise=(async()=>{
-      const sources=[
+      for(const src of [
         'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js',
         'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'
-      ];
-      for(const src of sources){
+      ]){
         try{
           await loadModule(src);
           if(customElements.get('model-viewer'))return true;
@@ -65,6 +64,11 @@
       return false;
     })();
     return modelViewerPromise;
+  }
+
+  function hasEmbeddedModel(entry){
+    const metadata=entry?.metadata&&typeof entry.metadata==='object'?entry.metadata:{};
+    return Array.isArray(metadata.model_base64_parts)||typeof metadata.model_base64==='string'||metadata.embedded_model===true||/\.(glb|gltf)(?:[?#]|$)/i.test(entry?.asset_url||'');
   }
 
   function decodeEmbeddedModel(entry){
@@ -125,17 +129,10 @@
     window.addEventListener('resize',()=>sliderState.forEach((_,name)=>updateSlider(name)),{passive:true});
   }
 
-  function createModelCard(entry,index){
-    const card=document.createElement('article');
-    card.className='model-card';
-    card.dataset.entryId=entry.id||'';
-
-    const media=document.createElement('div');
-    media.className='model-card-view';
-
+  function createViewer(entry,label='PROPERTY'){
     const viewer=document.createElement('model-viewer');
     viewer.src=decodeEmbeddedModel(entry);
-    viewer.alt=entry.description||entry.title||'DIRECTIVE I property model';
+    viewer.alt=entry.description||entry.title||`DIRECTIVE I ${label.toLowerCase()} model`;
     viewer.setAttribute('camera-controls','');
     viewer.setAttribute('touch-action','pan-y');
     viewer.setAttribute('shadow-intensity','1');
@@ -149,7 +146,7 @@
     const loading=document.createElement('div');
     loading.className='model-loading';
     const loadingStrong=document.createElement('strong');
-    loadingStrong.textContent='LOADING PROPERTY';
+    loadingStrong.textContent=`LOADING ${label}`;
     const loadingText=document.createElement('span');
     loadingText.textContent='0%';
     loading.append(loadingStrong,loadingText);
@@ -165,11 +162,20 @@
     viewer.addEventListener('error',()=>{
       loading.classList.remove('is-hidden');
       loading.classList.add('is-error');
-      loadingStrong.textContent='PROPERTY FAILED TO LOAD';
+      loadingStrong.textContent=`${label} FAILED TO LOAD`;
       loadingText.textContent='Tap reload or try again.';
     });
-    viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title}),{once:true});
+    viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title,kind:entry.kind}),{once:true});
+    return {viewer,loading};
+  }
 
+  function createModelCard(entry,index){
+    const card=document.createElement('article');
+    card.className='model-card';
+    card.dataset.entryId=entry.id||'';
+    const media=document.createElement('div');
+    media.className='model-card-view';
+    const {viewer,loading}=createViewer(entry,'PROPERTY');
     media.append(viewer,loading);
 
     const copy=document.createElement('div');
@@ -186,7 +192,6 @@
       p.textContent=entry.subtitle||entry.description;
       copy.appendChild(p);
     }
-
     card.append(media,copy);
     return card;
   }
@@ -194,15 +199,9 @@
   function renderModels(models){
     if(!modelTrack)return;
     modelTrack.replaceChildren();
-    if(!models.length){
-      empty(modelTrack,'PROPERTY ARCHIVE');
-      updateSlider('models');
-      return;
-    }
-
+    if(!models.length){empty(modelTrack,'PROPERTY ARCHIVE');updateSlider('models');return}
     models.forEach((entry,index)=>modelTrack.appendChild(createModelCard(entry,index)));
     updateSlider('models');
-
     ensureModelViewer().then(ready=>{
       if(ready)return;
       modelTrack.querySelectorAll('.model-loading').forEach(loading=>{
@@ -242,20 +241,31 @@
     if(!itemTrack)return;
     itemTrack.replaceChildren();
     if(!items.length){empty(itemTrack,'ITEM ARCHIVE READY');updateSlider('items');return}
-    items.forEach(entry=>{
+    let has3d=false;
+    items.forEach((entry,index)=>{
       const card=document.createElement('article');
       card.className='item-card';
       const media=document.createElement('div');
       media.className='item-media';
-      const img=document.createElement('img');
-      img.src=entry.thumbnail_url||entry.asset_url;
-      img.alt=entry.description||entry.title||'DIRECTIVE I project item';
-      img.loading='lazy';
-      media.appendChild(img);
+
+      if(hasEmbeddedModel(entry)){
+        has3d=true;
+        media.style.position='relative';
+        const {viewer,loading}=createViewer(entry,'PROJECT ITEM');
+        viewer.style.cssText='display:block;width:100%;height:100%;min-height:260px;background:transparent;';
+        media.append(viewer,loading);
+      }else{
+        const img=document.createElement('img');
+        img.src=entry.thumbnail_url||entry.asset_url;
+        img.alt=entry.description||entry.title||'DIRECTIVE I project item';
+        img.loading='lazy';
+        media.appendChild(img);
+      }
+
       const copy=document.createElement('div');
       copy.className='item-copy';
       const small=document.createElement('small');
-      small.textContent=entry.subtitle||'PROJECT ITEM';
+      small.textContent=entry.subtitle||`PROJECT ITEM ${String(index+1).padStart(2,'0')}`;
       const h3=document.createElement('h3');
       h3.textContent=entry.title||'Unnamed item';
       copy.append(small,h3);
@@ -268,12 +278,12 @@
       itemTrack.appendChild(card);
     });
     updateSlider('items');
+    if(has3d)ensureModelViewer();
   }
 
   async function load(){
     try{
-      const url=`${ENDPOINT}?t=${Date.now()}`;
-      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});
+      const res=await fetch(`${ENDPOINT}?t=${Date.now()}`,{headers:{Accept:'application/json'},cache:'no-store'});
       const data=await res.json();
       if(!res.ok||!data?.ok)throw new Error('showcase unavailable');
       const entries=Array.isArray(data.entries)?data.entries:[];
@@ -291,9 +301,8 @@
   }
 
   const revealNodes=Array.from(document.querySelectorAll('.reveal'));
-  if(reduceMotion||!('IntersectionObserver'in window)){
-    revealNodes.forEach(node=>node.classList.add('is-visible'));
-  }else{
+  if(reduceMotion||!('IntersectionObserver'in window))revealNodes.forEach(node=>node.classList.add('is-visible'));
+  else{
     const observer=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
         if(!entry.isIntersecting)return;
