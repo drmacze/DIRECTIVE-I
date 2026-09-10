@@ -10,7 +10,7 @@
   <title>DIRECTIVE I — Showcase</title>
   <script src="entry-gate.js?v=1"></script>
   <link rel="stylesheet" href="showcase.css?v=2" />
-  <link rel="stylesheet" href="showcase-managed.css?v=1" />
+  <link rel="stylesheet" href="showcase-managed.css?v=2" />
 </head>
 <body>
   <main class="showcase-shell">
@@ -26,36 +26,67 @@
     </section>
 
     <section class="showcase-section reveal" aria-labelledby="model-title">
-      <div class="section-head">
-        <div><p class="section-index">01 / 3D ARCHIVE</p><h2 class="section-title" id="model-title">3D Model</h2></div>
-        <span class="section-meta">Drag · Rotate · Inspect</span>
+      <div class="section-head slider-section-head">
+        <div>
+          <p class="section-index">01 / 3D ARCHIVE</p>
+          <h2 class="section-title" id="model-title">3D Model</h2>
+        </div>
+        <div class="slider-head-side">
+          <span class="section-meta">Swipe · Drag · Inspect</span>
+          <div class="slider-controls" aria-label="3D model slider controls">
+            <button type="button" data-slider-prev="models" aria-label="Previous 3D model">←</button>
+            <button type="button" data-slider-next="models" aria-label="Next 3D model">→</button>
+          </div>
+        </div>
       </div>
-      <div class="model-tabs" data-model-tabs></div>
-      <div class="model-stage" data-model-stage>
-        <div class="model-empty" data-model-empty><strong>3D MODEL VIEWER</strong><span>3D project assets will appear here.</span></div>
+      <div class="showcase-slider" data-slider="models">
+        <div class="showcase-track model-track" data-model-track></div>
       </div>
     </section>
 
     <section class="showcase-section reveal" aria-labelledby="frames-title">
-      <div class="section-head">
-        <div><p class="section-index">02 / PROJECT MEDIA</p><h2 class="section-title" id="frames-title">Project Frames</h2></div>
-        <span class="section-meta">Cinematic archive</span>
+      <div class="section-head slider-section-head">
+        <div>
+          <p class="section-index">02 / PROJECT MEDIA</p>
+          <h2 class="section-title" id="frames-title">Project Frames</h2>
+        </div>
+        <div class="slider-head-side">
+          <span class="section-meta">Cinematic archive</span>
+          <div class="slider-controls" aria-label="Project frame slider controls">
+            <button type="button" data-slider-prev="frames" aria-label="Previous project frame">←</button>
+            <button type="button" data-slider-next="frames" aria-label="Next project frame">→</button>
+          </div>
+        </div>
       </div>
-      <div class="frame-grid" data-frame-grid></div>
+      <div class="showcase-slider" data-slider="frames">
+        <div class="showcase-track frame-track" data-frame-grid></div>
+      </div>
     </section>
 
     <section class="showcase-section reveal" aria-labelledby="items-title">
-      <div class="section-head">
-        <div><p class="section-index">03 / ASSET ARCHIVE</p><h2 class="section-title" id="items-title">Project Items</h2></div>
-        <span class="section-meta">Weapons · Equipment · Props</span>
+      <div class="section-head slider-section-head">
+        <div>
+          <p class="section-index">03 / ASSET ARCHIVE</p>
+          <h2 class="section-title" id="items-title">Project Items</h2>
+        </div>
+        <div class="slider-head-side">
+          <span class="section-meta">Weapons · Equipment · Props</span>
+          <div class="slider-controls" aria-label="Project item slider controls">
+            <button type="button" data-slider-prev="items" aria-label="Previous project item">←</button>
+            <button type="button" data-slider-next="items" aria-label="Next project item">→</button>
+          </div>
+        </div>
       </div>
-      <div class="item-grid" data-item-grid></div>
+      <div class="showcase-slider" data-slider="items">
+        <div class="showcase-track item-track" data-item-grid></div>
+      </div>
     </section>
 
     <footer class="showcase-footer">DIRECTIVE I · Visual development archive</footer>
   </main>
 
-  <script src="showcase.js?v=2"></script>
+  <script src="site-analytics.js?v=1"></script>
+  <script src="showcase.js?v=3"></script>
   <script>
     (() => {
       const script=document.createElement('script');
