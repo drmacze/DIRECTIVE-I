@@ -6,11 +6,11 @@
   const handoffPage = document.querySelector('[data-docs-handoff-page]');
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-  let routed = false;
+  let committed = false;
   let raf = 0;
 
   function renderLines() {
-    if (reduceMotion) return;
+    if (reduceMotion || committed) return;
     const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
     const center = viewport * .5;
 
@@ -33,31 +33,57 @@
     });
   }
 
-  function renderHandoff() {
-    if (!handoff || !handoffPage) return;
-    const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
-    const rect = handoff.getBoundingClientRect();
-    const progress = clamp(1 - rect.top / viewport, 0, 1);
-    const eased = progress * progress * (3 - 2 * progress);
-    const y = (1 - eased) * 100;
+  function commitDocumentation() {
+    if (committed) return;
+    committed = true;
+    document.body.classList.add('docs-committed');
+    document.title = 'DIRECTIVE I — Documentation';
 
-    handoffPage.style.transform = `translate3d(0,${y.toFixed(3)}%,0)`;
-    handoffPage.style.opacity = String(.72 + eased * .28);
+    if (handoffPage) {
+      handoffPage.style.transform = 'none';
+      handoffPage.style.opacity = '1';
+      handoffPage.style.filter = 'none';
+    }
+
+    try {
+      history.replaceState({ directiveView: 'documentation' }, '', 'documentation.html');
+      sessionStorage.removeItem('directive_docs_handoff');
+    } catch (_) {}
+
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    });
+  }
+
+  function renderHandoff() {
+    if (!handoff || !handoffPage || committed) return;
+
+    const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
+    const sectionTop = handoff.offsetTop;
+    const travel = Math.max(1, handoff.offsetHeight - viewport);
+    const raw = clamp((window.scrollY - sectionTop) / travel, 0, 1);
+    const eased = raw * raw * (3 - 2 * raw);
+
+    const y = (1 - eased) * 104;
+    const scale = .985 + eased * .015;
+    const opacity = .68 + eased * .32;
+    const blur = (1 - eased) * 2;
+
+    handoffPage.style.transform = `translate3d(0,${y.toFixed(3)}%,0) scale(${scale.toFixed(4)})`;
+    handoffPage.style.opacity = opacity.toFixed(3);
+    handoffPage.style.filter = `blur(${blur.toFixed(2)}px)`;
 
     if (track) {
-      track.style.opacity = String(1 - progress * .42);
-      track.style.filter = `blur(${(progress * 5).toFixed(2)}px)`;
-      track.style.transform = `translate3d(0,${(-progress * 18).toFixed(2)}px,0) scale(${(1 - progress * .012).toFixed(4)})`;
+      const fade = clamp(raw * 1.1, 0, 1);
+      track.style.opacity = String(1 - fade * .55);
+      track.style.filter = `blur(${(fade * 7).toFixed(2)}px)`;
+      track.style.transform = `translate3d(0,${(-fade * 34).toFixed(2)}px,0) scale(${(1 - fade * .018).toFixed(4)})`;
     }
 
-    if (progress >= .997 && !routed) {
-      routed = true;
-      handoff.classList.add('is-complete');
-      try { sessionStorage.setItem('directive_docs_handoff', '1'); } catch (_) {}
-      window.setTimeout(() => {
-        window.location.replace('documentation.html?from=core');
-      }, reduceMotion ? 0 : 90);
-    }
+    document.documentElement.style.setProperty('--docs-handoff-progress', raw.toFixed(4));
+
+    if (raw >= .998) commitDocumentation();
   }
 
   function render() {
@@ -66,7 +92,7 @@
   }
 
   const schedule = () => {
-    if (raf) return;
+    if (raf || committed) return;
     raf = requestAnimationFrame(() => {
       raf = 0;
       render();
