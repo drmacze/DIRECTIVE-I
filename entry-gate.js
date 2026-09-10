@@ -8,6 +8,14 @@
     return;
   }
 
+  if (!document.querySelector('script[data-directive-analytics]')) {
+    const analytics = document.createElement('script');
+    analytics.src = 'site-analytics.js?v=1';
+    analytics.defer = true;
+    analytics.dataset.directiveAnalytics = '1';
+    document.head.appendChild(analytics);
+  }
+
   let shouldAnimate = false;
   try {
     shouldAnimate = sessionStorage.getItem('directive_home_entry') === '1';
