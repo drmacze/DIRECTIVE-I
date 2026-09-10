@@ -4,8 +4,8 @@
   const modelTrack=document.querySelector('[data-model-track]');
   const frameTrack=document.querySelector('[data-frame-grid]');
   const itemTrack=document.querySelector('[data-item-grid]');
-  let modelViewerLoaded=false;
   const sliderState=new Map();
+  let modelViewerPromise=null;
 
   const empty=(root,title,copy='Content will appear here when published from the developer console.')=>{
     if(!root)return;
@@ -22,16 +22,48 @@
     root.appendChild(card);
   };
 
-  function loadModelViewer(){
-    if(modelViewerLoaded||customElements.get('model-viewer')){modelViewerLoaded=true;return Promise.resolve(true)}
-    return new Promise(resolve=>{
-      const s=document.createElement('script');
-      s.type='module';
-      s.src='https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
-      s.onload=()=>{modelViewerLoaded=true;resolve(true)};
-      s.onerror=()=>resolve(false);
-      document.head.appendChild(s);
+  function loadModule(src,timeout=9000){
+    return new Promise((resolve,reject)=>{
+      const existing=document.querySelector(`script[data-model-viewer-src="${src}"]`);
+      if(existing){
+        if(customElements.get('model-viewer'))return resolve(true);
+        existing.addEventListener('load',()=>resolve(true),{once:true});
+        existing.addEventListener('error',()=>reject(new Error('MODEL_VIEWER_SCRIPT_FAILED')),{once:true});
+        return;
+      }
+      const script=document.createElement('script');
+      script.type='module';
+      script.src=src;
+      script.dataset.modelViewerSrc=src;
+      const timer=setTimeout(()=>reject(new Error('MODEL_VIEWER_TIMEOUT')),timeout);
+      script.onload=()=>{clearTimeout(timer);resolve(true)};
+      script.onerror=()=>{clearTimeout(timer);reject(new Error('MODEL_VIEWER_SCRIPT_FAILED'))};
+      document.head.appendChild(script);
     });
+  }
+
+  function ensureModelViewer(){
+    if(customElements.get('model-viewer'))return Promise.resolve(true);
+    if(modelViewerPromise)return modelViewerPromise;
+    modelViewerPromise=(async()=>{
+      const sources=[
+        'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js',
+        'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'
+      ];
+      for(const src of sources){
+        try{
+          await loadModule(src);
+          if(customElements.get('model-viewer'))return true;
+          await Promise.race([
+            customElements.whenDefined('model-viewer'),
+            new Promise((_,reject)=>setTimeout(()=>reject(new Error('MODEL_VIEWER_DEFINE_TIMEOUT')),4000))
+          ]);
+          if(customElements.get('model-viewer'))return true;
+        }catch(_){ }
+      }
+      return false;
+    })();
+    return modelViewerPromise;
   }
 
   function updateSlider(name){
@@ -52,7 +84,8 @@
       sliderState.set(name,{root,prev,next});
       const step=direction=>{
         const first=root.querySelector('.showcase-track > *');
-        const gap=parseFloat(getComputedStyle(root.querySelector('.showcase-track')).gap||'0')||0;
+        const track=root.querySelector('.showcase-track');
+        const gap=parseFloat(track?getComputedStyle(track).gap:'0')||0;
         const amount=(first?.getBoundingClientRect().width||root.clientWidth*.82)+gap;
         root.scrollBy({left:amount*direction,behavior:reduceMotion?'auto':'smooth'});
       };
@@ -63,64 +96,101 @@
         cancelAnimationFrame(raf);
         raf=requestAnimationFrame(()=>updateSlider(name));
       },{passive:true});
-      new MutationObserver(()=>requestAnimationFrame(()=>updateSlider(name))).observe(root.querySelector('.showcase-track'),{childList:true});
+      const track=root.querySelector('.showcase-track');
+      if(track)new MutationObserver(()=>requestAnimationFrame(()=>updateSlider(name))).observe(track,{childList:true});
       updateSlider(name);
     });
     window.addEventListener('resize',()=>sliderState.forEach((_,name)=>updateSlider(name)),{passive:true});
   }
 
-  async function renderModels(models){
+  function createModelCard(entry,index){
+    const card=document.createElement('article');
+    card.className='model-card';
+    card.dataset.entryId=entry.id||'';
+
+    const media=document.createElement('div');
+    media.className='model-card-view';
+
+    const viewer=document.createElement('model-viewer');
+    viewer.src=entry.asset_url;
+    viewer.alt=entry.description||entry.title||'DIRECTIVE I 3D model';
+    viewer.setAttribute('camera-controls','');
+    viewer.setAttribute('touch-action','pan-y');
+    viewer.setAttribute('shadow-intensity','1');
+    viewer.setAttribute('environment-image','neutral');
+    viewer.setAttribute('interaction-prompt','auto');
+    viewer.setAttribute('loading','eager');
+    viewer.setAttribute('reveal','auto');
+    if(entry.thumbnail_url)viewer.setAttribute('poster',entry.thumbnail_url);
+    if(!reduceMotion)viewer.setAttribute('auto-rotate','');
+
+    const loading=document.createElement('div');
+    loading.className='model-loading';
+    const loadingStrong=document.createElement('strong');
+    loadingStrong.textContent='LOADING 3D MODEL';
+    const loadingText=document.createElement('span');
+    loadingText.textContent='0%';
+    loading.append(loadingStrong,loadingText);
+
+    viewer.addEventListener('progress',event=>{
+      const progress=Math.max(0,Math.min(1,Number(event?.detail?.totalProgress||0)));
+      loadingText.textContent=`${Math.round(progress*100)}%`;
+    });
+    viewer.addEventListener('load',()=>{
+      loading.classList.add('is-hidden');
+      setTimeout(()=>loading.remove(),350);
+    },{once:true});
+    viewer.addEventListener('error',()=>{
+      loading.classList.remove('is-hidden');
+      loading.classList.add('is-error');
+      loadingStrong.textContent='MODEL FAILED TO LOAD';
+      loadingText.textContent='Tap reload or try again.';
+    });
+    viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title}),{once:true});
+
+    media.append(viewer,loading);
+
+    const copy=document.createElement('div');
+    copy.className='model-card-copy';
+    const titleWrap=document.createElement('div');
+    const small=document.createElement('small');
+    small.textContent=`MODEL ${String(index+1).padStart(2,'0')}`;
+    const h3=document.createElement('h3');
+    h3.textContent=entry.title||`Model ${index+1}`;
+    titleWrap.append(small,h3);
+    copy.appendChild(titleWrap);
+    if(entry.subtitle||entry.description){
+      const p=document.createElement('p');
+      p.textContent=entry.subtitle||entry.description;
+      copy.appendChild(p);
+    }
+
+    card.append(media,copy);
+    return card;
+  }
+
+  function renderModels(models){
     if(!modelTrack)return;
     modelTrack.replaceChildren();
-    if(!models.length){empty(modelTrack,'3D MODEL ARCHIVE');updateSlider('models');return}
-    const viewerReady=await loadModelViewer();
-    models.forEach((entry,index)=>{
-      const card=document.createElement('article');
-      card.className='model-card';
-      card.dataset.entryId=entry.id||'';
+    if(!models.length){
+      empty(modelTrack,'3D MODEL ARCHIVE');
+      updateSlider('models');
+      return;
+    }
 
-      const media=document.createElement('div');
-      media.className='model-card-view';
-      if(viewerReady&&customElements.get('model-viewer')){
-        const viewer=document.createElement('model-viewer');
-        viewer.src=entry.asset_url;
-        viewer.alt=entry.description||entry.title||'DIRECTIVE I 3D model';
-        viewer.setAttribute('camera-controls','');
-        viewer.setAttribute('touch-action','pan-y');
-        viewer.setAttribute('shadow-intensity','1');
-        viewer.setAttribute('environment-image','neutral');
-        viewer.setAttribute('interaction-prompt','auto');
-        viewer.setAttribute('loading','lazy');
-        viewer.setAttribute('reveal','auto');
-        if(entry.thumbnail_url)viewer.setAttribute('poster',entry.thumbnail_url);
-        if(!reduceMotion)viewer.setAttribute('auto-rotate','');
-        viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title}),{once:true});
-        media.appendChild(viewer);
-      }else{
-        const fallback=document.createElement('div');
-        fallback.className='slider-empty';
-        fallback.innerHTML='<div><strong>3D VIEWER</strong><span>Viewer unavailable on this device.</span></div>';
-        media.appendChild(fallback);
-      }
-
-      const copy=document.createElement('div');
-      copy.className='model-card-copy';
-      const titleWrap=document.createElement('div');
-      const small=document.createElement('small');
-      small.textContent=`MODEL ${String(index+1).padStart(2,'0')}`;
-      const h3=document.createElement('h3');
-      h3.textContent=entry.title||`Model ${index+1}`;
-      titleWrap.append(small,h3);
-      copy.appendChild(titleWrap);
-      if(entry.subtitle||entry.description){
-        const p=document.createElement('p');
-        p.textContent=entry.subtitle||entry.description;
-        copy.appendChild(p);
-      }
-      card.append(media,copy);
-      modelTrack.appendChild(card);
-    });
+    models.forEach((entry,index)=>modelTrack.appendChild(createModelCard(entry,index)));
     updateSlider('models');
+
+    ensureModelViewer().then(ready=>{
+      if(ready)return;
+      modelTrack.querySelectorAll('.model-loading').forEach(loading=>{
+        loading.classList.add('is-error');
+        const strong=loading.querySelector('strong');
+        const span=loading.querySelector('span');
+        if(strong)strong.textContent='3D VIEWER UNAVAILABLE';
+        if(span)span.textContent='Viewer library could not be loaded.';
+      });
+    });
   }
 
   function renderImages(images){
@@ -180,15 +250,16 @@
 
   async function load(){
     try{
-      const res=await fetch(ENDPOINT,{headers:{Accept:'application/json'}});
+      const url=`${ENDPOINT}?t=${Date.now()}`;
+      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});
       const data=await res.json();
       if(!res.ok||!data?.ok)throw new Error('showcase unavailable');
       const entries=Array.isArray(data.entries)?data.entries:[];
-      await renderModels(entries.filter(x=>x.kind==='model'));
+      renderModels(entries.filter(x=>x.kind==='model'));
       renderImages(entries.filter(x=>x.kind==='image'));
       renderItems(entries.filter(x=>x.kind==='item'));
     }catch(_){
-      await renderModels([]);
+      renderModels([]);
       if(frameTrack){
         frameTrack.innerHTML='<figure class="frame-card"><img src="assets/directive-i-hero-poster.jpg" alt="DIRECTIVE I cinematic project frame"><figcaption><span>World / Atmosphere</span><span>01</span></figcaption></figure><figure class="frame-card"><img src="assets/directive-i-trailer-poster.jpg" alt="DIRECTIVE I trailer project frame"><figcaption><span>Transmission / Scene</span><span>02</span></figcaption></figure>';
         updateSlider('frames');
