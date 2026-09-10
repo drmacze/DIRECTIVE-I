@@ -1,0 +1,103 @@
+@media (max-width: 620px) {
+  .docs-main,
+  .handoff-main {
+    width: calc(100vw - 32px);
+    min-width: 0;
+    padding-top: max(56px, calc(env(safe-area-inset-top) + 32px));
+    padding-bottom: max(36px, calc(env(safe-area-inset-bottom) + 24px));
+    justify-content: flex-start;
+  }
+
+  .docs-hero,
+  .handoff-hero {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .docs-kicker,
+  .handoff-kicker {
+    font-size: 9px;
+    line-height: 1.2;
+    letter-spacing: .24em;
+  }
+
+  .docs-hero h1,
+  .handoff-hero h2 {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 18px;
+    font-size: clamp(40px, 12.5vw, 58px);
+    line-height: .9;
+    letter-spacing: -.06em;
+    white-space: nowrap;
+  }
+
+  .docs-grid,
+  .handoff-grid {
+    width: 100%;
+    margin-top: clamp(104px, 16svh, 150px);
+  }
+
+  .docs-row,
+  .handoff-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    padding: 24px 0 26px;
+  }
+
+  .docs-row[href]:hover,
+  .docs-row[href]:focus-visible,
+  .handoff-row[href]:hover,
+  .handoff-row[href]:focus-visible {
+    padding-left: 0;
+  }
+
+  .docs-row-index,
+  .handoff-row > span {
+    padding-top: 4px;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: .14em;
+  }
+
+  .docs-row-copy small,
+  .handoff-row small {
+    font-size: 8.5px;
+    line-height: 1.2;
+    letter-spacing: .19em;
+  }
+
+  .docs-row-copy h2,
+  .handoff-row strong {
+    margin-top: 9px;
+    font-size: clamp(30px, 9.4vw, 42px);
+    line-height: .94;
+    letter-spacing: -.048em;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+}
+
+@media (max-width: 360px) {
+  .docs-main,
+  .handoff-main {
+    width: calc(100vw - 28px);
+  }
+
+  .docs-hero h1,
+  .handoff-hero h2 {
+    font-size: clamp(38px, 12vw, 44px);
+  }
+
+  .docs-grid,
+  .handoff-grid {
+    margin-top: 96px;
+  }
+
+  .docs-row-copy h2,
+  .handoff-row strong {
+    font-size: clamp(28px, 9vw, 36px);
+  }
+}
