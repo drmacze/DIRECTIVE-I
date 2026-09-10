@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050707" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="DIRECTIVE I core gameplay systems." />
+  <title>DIRECTIVE I — Core Gameplay</title>
+  <script src="entry-gate.js?v=1"></script>
+  <link rel="stylesheet" href="core-gameplay.css?v=1" />
+</head>
+<body>
+  <button class="core-nav" type="button" aria-label="Open navigation" aria-expanded="false" data-core-nav>
+    <span></span><span></span>
+  </button>
+  <nav class="core-nav-panel" aria-hidden="true" data-core-nav-panel>
+    <a href="documentation.html">Documentation</a>
+    <a href="story.html">Main Story</a>
+    <a href="index.html">Home</a>
+  </nav>
+
+  <main class="core-scroll" aria-label="Core gameplay features">
+    <div class="core-track">
+      <p class="core-line" data-core-line>Tactical combat</p>
+      <p class="core-line" data-core-line>Real Physics</p>
+      <p class="core-line" data-core-line>High polly rendering</p>
+      <p class="core-line" data-core-line>Smart AI</p>
+      <p class="core-line" data-core-line>Realistic Animation</p>
+      <p class="core-line" data-core-line>Movement engine 2.0</p>
+      <p class="core-line" data-core-line>Red zone sistem</p>
+      <p class="core-line" data-core-line>Re-Make Zombie texture</p>
+      <p class="core-line" data-core-line>Vehicle system</p>
+      <p class="core-line" data-core-line>Stats Guns &amp; Attachment</p>
+      <p class="core-line" data-core-line>More Survival experience</p>
+      <p class="core-line" data-core-line>Chaos VFX</p>
+      <p class="core-line" data-core-line>Enhance VFX</p>
+      <p class="core-line" data-core-line>Gore VFX</p>
+      <p class="core-line" data-core-line>Military System</p>
+      <p class="core-line" data-core-line>Open world Map</p>
+      <p class="core-line" data-core-line>Season Campaign</p>
+      <p class="core-coming" data-core-line>More features coming soon in season 2</p>
+    </div>
+  </main>
+
+  <script src="core-gameplay.js?v=1"></script>
+  <script>
+    (() => {
+      const script=document.createElement('script');
+      script.src='music-player.js?v=8';
+      script.onload=()=>{const w=document.querySelector('.directive-music-wrap');if(w)w.style.display='none'};
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
