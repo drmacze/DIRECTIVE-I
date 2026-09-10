@@ -1,4 +1,12 @@
 (() => {
+  if (!document.querySelector('script[data-directive-official-branding]')) {
+    const branding = document.createElement('script');
+    branding.src = 'official-branding.js?v=1';
+    branding.dataset.directiveOfficialBranding = '';
+    branding.defer = true;
+    document.head.appendChild(branding);
+  }
+
   const PROFILE_KEY = 'directive_minecraft_profile';
   const LOGOUT_REVEAL_KEY = 'directive_logout_reveal';
   const MUSIC_KEYS = [
