@@ -5,6 +5,7 @@
   const frameTrack=document.querySelector('[data-frame-grid]');
   const itemTrack=document.querySelector('[data-item-grid]');
   const sliderState=new Map();
+  const modelObjectUrls=new Map();
   let modelViewerPromise=null;
 
   const empty=(root,title,copy='Content will appear here when published from the developer console.')=>{
@@ -66,6 +67,27 @@
     return modelViewerPromise;
   }
 
+  function decodeEmbeddedModel(entry){
+    const id=String(entry?.id||entry?.title||Math.random());
+    if(modelObjectUrls.has(id))return modelObjectUrls.get(id);
+    const metadata=entry?.metadata&&typeof entry.metadata==='object'?entry.metadata:{};
+    let encoded='';
+    if(Array.isArray(metadata.model_base64_parts))encoded=metadata.model_base64_parts.join('');
+    else if(typeof metadata.model_base64==='string')encoded=metadata.model_base64;
+    if(!encoded)return entry?.asset_url||'';
+    try{
+      const raw=atob(encoded.replace(/\s+/g,''));
+      const bytes=new Uint8Array(raw.length);
+      for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+      const url=URL.createObjectURL(new Blob([bytes],{type:'model/gltf-binary'}));
+      modelObjectUrls.set(id,url);
+      return url;
+    }catch(error){
+      console.warn('DIRECTIVE I embedded model decode failed',entry?.title,error);
+      return entry?.asset_url||'';
+    }
+  }
+
   function updateSlider(name){
     const state=sliderState.get(name);
     if(!state)return;
@@ -112,8 +134,8 @@
     media.className='model-card-view';
 
     const viewer=document.createElement('model-viewer');
-    viewer.src=entry.asset_url;
-    viewer.alt=entry.description||entry.title||'DIRECTIVE I 3D model';
+    viewer.src=decodeEmbeddedModel(entry);
+    viewer.alt=entry.description||entry.title||'DIRECTIVE I property model';
     viewer.setAttribute('camera-controls','');
     viewer.setAttribute('touch-action','pan-y');
     viewer.setAttribute('shadow-intensity','1');
@@ -127,7 +149,7 @@
     const loading=document.createElement('div');
     loading.className='model-loading';
     const loadingStrong=document.createElement('strong');
-    loadingStrong.textContent='LOADING 3D MODEL';
+    loadingStrong.textContent='LOADING PROPERTY';
     const loadingText=document.createElement('span');
     loadingText.textContent='0%';
     loading.append(loadingStrong,loadingText);
@@ -143,7 +165,7 @@
     viewer.addEventListener('error',()=>{
       loading.classList.remove('is-hidden');
       loading.classList.add('is-error');
-      loadingStrong.textContent='MODEL FAILED TO LOAD';
+      loadingStrong.textContent='PROPERTY FAILED TO LOAD';
       loadingText.textContent='Tap reload or try again.';
     });
     viewer.addEventListener('pointerdown',()=>window.DIRECTIVE_ANALYTICS?.track?.('showcase_model_view',{id:entry.id,title:entry.title}),{once:true});
@@ -154,9 +176,9 @@
     copy.className='model-card-copy';
     const titleWrap=document.createElement('div');
     const small=document.createElement('small');
-    small.textContent=`MODEL ${String(index+1).padStart(2,'0')}`;
+    small.textContent=`PROPERTY ${String(index+1).padStart(2,'0')}`;
     const h3=document.createElement('h3');
-    h3.textContent=entry.title||`Model ${index+1}`;
+    h3.textContent=entry.title||`Property ${index+1}`;
     titleWrap.append(small,h3);
     copy.appendChild(titleWrap);
     if(entry.subtitle||entry.description){
@@ -173,7 +195,7 @@
     if(!modelTrack)return;
     modelTrack.replaceChildren();
     if(!models.length){
-      empty(modelTrack,'3D MODEL ARCHIVE');
+      empty(modelTrack,'PROPERTY ARCHIVE');
       updateSlider('models');
       return;
     }
@@ -281,6 +303,11 @@
     },{threshold:.12,rootMargin:'0px 0px -7% 0px'});
     revealNodes.forEach(node=>observer.observe(node));
   }
+
+  window.addEventListener('beforeunload',()=>{
+    modelObjectUrls.forEach(url=>URL.revokeObjectURL(url));
+    modelObjectUrls.clear();
+  },{once:true});
 
   setupSliders();
   load();
