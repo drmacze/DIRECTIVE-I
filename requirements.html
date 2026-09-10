@@ -9,7 +9,7 @@
   <meta name="description" content="DIRECTIVE I system requirements and device compatibility checker." />
   <title>DIRECTIVE I — Requirements</title>
   <script src="entry-gate.js?v=1"></script>
-  <link rel="stylesheet" href="requirements.css?v=1" />
+  <link rel="stylesheet" href="requirements.css?v=2" />
 </head>
 <body>
   <main class="req-shell">
@@ -56,35 +56,43 @@
         <div>
           <p class="req-kicker">LIVE HARDWARE SCAN</p>
           <h2 id="checker-title">Check this device.</h2>
-          <p><em>The browser will inspect the hardware information it is allowed to expose. Private hardware fields that browsers hide are marked for manual confirmation instead of being guessed.</em></p>
+          <p class="checker-copy"><em>Run a lightweight compatibility scan. Only hardware details the browser is allowed to expose will be checked automatically.</em></p>
+          <p class="checker-privacy">Private or unavailable hardware fields are never guessed</p>
         </div>
         <button class="check-button" type="button" data-check-device>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v5h5"/><path d="m9 12 2 2 4-5"/></svg>
           <span>CHECK DEVICE</span>
         </button>
       </div>
-
-      <div class="scan-panel" data-scan-panel aria-live="polite">
-        <div class="scan-verdict" data-scan-verdict data-state="idle">
-          <span class="verdict-dot" aria-hidden="true"></span>
-          <div><small>Compatibility Status</small><strong>READY TO SCAN</strong></div>
-        </div>
-        <div class="scan-grid">
-          <div class="scan-row"><span>Platform</span><strong data-platform>—</strong><i data-platform-status>Waiting</i></div>
-          <div class="scan-row"><span>GPU</span><strong data-gpu>—</strong><i data-gpu-status>Waiting</i></div>
-          <div class="scan-row"><span>Graphics API</span><strong data-api>—</strong><i data-api-status>Waiting</i></div>
-          <div class="scan-row"><span>Memory</span><strong data-memory>—</strong><i data-memory-status>Waiting</i></div>
-          <div class="scan-row"><span>Free Storage</span><strong data-storage>10 GB required</strong><i data-storage-status>Manual check</i></div>
-        </div>
-        <p class="scan-note" data-scan-note>Press <strong>CHECK DEVICE</strong> to start the compatibility scan.</p>
-      </div>
     </section>
 
     <footer class="req-footer">DIRECTIVE I · Minimum compatibility baseline</footer>
   </main>
 
+  <div class="scan-layer" data-scan-layer aria-hidden="true">
+    <div class="scan-backdrop" aria-hidden="true"></div>
+    <section class="scan-sheet" data-scan-sheet role="dialog" aria-modal="true" aria-labelledby="scan-result-title" tabindex="-1">
+      <div class="scan-handle" aria-hidden="true"></div>
+      <div class="scan-verdict" data-scan-verdict data-state="idle">
+        <span class="verdict-dot" aria-hidden="true"></span>
+        <div><small>Compatibility Status</small><strong id="scan-result-title">READY</strong></div>
+      </div>
+
+      <div class="scan-list">
+        <div class="scan-row"><span>Platform</span><div class="scan-value"><strong data-platform>—</strong><i data-platform-status>Waiting</i></div></div>
+        <div class="scan-row"><span>GPU</span><div class="scan-value"><strong data-gpu>—</strong><i data-gpu-status>Waiting</i></div></div>
+        <div class="scan-row"><span>Graphics API</span><div class="scan-value"><strong data-api>—</strong><i data-api-status>Waiting</i></div></div>
+        <div class="scan-row"><span>Memory</span><div class="scan-value"><strong data-memory>—</strong><i data-memory-status>Waiting</i></div></div>
+        <div class="scan-row"><span>Free Storage</span><div class="scan-value"><strong data-storage>10 GB free required</strong><i data-storage-status>Manual check</i></div></div>
+      </div>
+
+      <p class="scan-note" data-scan-note>Compatibility scan complete.</p>
+      <span class="scan-dismiss">Tap anywhere to dismiss</span>
+    </section>
+  </div>
+
   <script src="site-analytics.js?v=2"></script>
-  <script src="requirements.js?v=1"></script>
+  <script src="requirements.js?v=2"></script>
   <script>
     (()=>{const s=document.createElement('script');s.src='music-player.js?v=8';s.onload=()=>{const w=document.querySelector('.directive-music-wrap');if(w)w.style.display='none'};document.body.appendChild(s)})();
   </script>
