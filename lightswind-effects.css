@@ -58,7 +58,7 @@
 .hero-meta::before,
 .feature-strip::before,
 .trailer-card::after,
-.intel-card::after{
+.intel-card::before{
   content:"";
   position:absolute;
   pointer-events:none;
@@ -93,11 +93,12 @@
   box-shadow:0 0 22px rgba(85,243,164,.22);
 }
 
-.intel-card::after{
+.intel-card::before{
   left:8%;right:8%;bottom:-1px;height:2px;
   opacity:.66;
   filter:blur(.3px);
   box-shadow:0 0 28px rgba(112,226,36,.18);
+  z-index:2;
 }
 
 .kicker::after,
@@ -156,7 +157,7 @@
 
 @media(prefers-reduced-motion:reduce){
   .directive-shiny-text,.directive-shiny-split,
-  .hero-meta::before,.feature-strip::before,.trailer-card::after,.intel-card::after,
+  .hero-meta::before,.feature-strip::before,.trailer-card::after,.intel-card::before,
   .kicker::after,.story-label::after,.welcome-kicker::after,
   .overview-section::after,.systems-section::after{
     animation:none!important;
