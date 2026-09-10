@@ -6,15 +6,10 @@
   const handoffPage = document.querySelector('[data-docs-handoff-page]');
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-  const AUTO_SCROLL_SPEED = 46;
-  const AUTO_SCROLL_PAUSE = 3200;
-
   let committed = false;
   let raf = 0;
-  let autoRaf = 0;
-  let autoActive = false;
-  let autoLast = 0;
-  let autoPauseUntil = 0;
+  let lenis = null;
+  let lenisRaf = 0;
 
   function renderLines() {
     if (reduceMotion || committed) return;
@@ -40,17 +35,21 @@
     });
   }
 
-  function stopAutoScroll() {
-    autoActive = false;
-    autoLast = 0;
-    if (autoRaf) cancelAnimationFrame(autoRaf);
-    autoRaf = 0;
+  function stopLenis() {
+    if (lenisRaf) cancelAnimationFrame(lenisRaf);
+    lenisRaf = 0;
+
+    if (lenis) {
+      try { lenis.destroy(); } catch (_) {}
+      lenis = null;
+    }
   }
 
   function commitDocumentation() {
     if (committed) return;
     committed = true;
-    stopAutoScroll();
+    stopLenis();
+
     document.body.classList.add('docs-committed');
     document.title = 'DIRECTIVE I — Documentation';
 
@@ -69,52 +68,6 @@
       window.scrollTo(0, 0);
       requestAnimationFrame(() => window.scrollTo(0, 0));
     });
-  }
-
-  function autoScrollStep(now) {
-    if (!autoActive || committed || reduceMotion || !handoff) {
-      stopAutoScroll();
-      return;
-    }
-
-    if (!autoLast) autoLast = now;
-    const dt = Math.min(50, now - autoLast);
-    autoLast = now;
-
-    if (now >= autoPauseUntil) {
-      const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
-      const sectionTop = handoff.offsetTop;
-      const end = sectionTop + Math.max(1, handoff.offsetHeight - viewport);
-      const current = window.scrollY;
-
-      if (current < sectionTop - 4) {
-        stopAutoScroll();
-        return;
-      }
-
-      const next = Math.min(end, current + AUTO_SCROLL_SPEED * (dt / 1000));
-      if (next > current) window.scrollTo(0, next);
-
-      if (next >= end - 1) {
-        commitDocumentation();
-        return;
-      }
-    }
-
-    autoRaf = requestAnimationFrame(autoScrollStep);
-  }
-
-  function startAutoScroll() {
-    if (reduceMotion || committed || autoActive || !handoff) return;
-    autoActive = true;
-    autoLast = 0;
-    autoRaf = requestAnimationFrame(autoScrollStep);
-  }
-
-  function pauseAutoScroll() {
-    if (!autoActive || committed) return;
-    autoPauseUntil = performance.now() + AUTO_SCROLL_PAUSE;
-    autoLast = 0;
   }
 
   function renderHandoff() {
@@ -144,7 +97,6 @@
 
     document.documentElement.style.setProperty('--docs-handoff-progress', raw.toFixed(4));
 
-    if (window.scrollY >= sectionTop - 2 && raw < .998) startAutoScroll();
     if (raw >= .998) commitDocumentation();
   }
 
@@ -161,16 +113,36 @@
     });
   };
 
-  const manualKeys = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar']);
-  addEventListener('wheel', pauseAutoScroll, { passive: true });
-  addEventListener('touchstart', pauseAutoScroll, { passive: true });
-  addEventListener('pointerdown', pauseAutoScroll, { passive: true });
-  addEventListener('keydown', (event) => {
-    if (manualKeys.has(event.key)) pauseAutoScroll();
-  });
+  function initLenis() {
+    if (reduceMotion || committed || typeof window.Lenis !== 'function') return;
 
+    lenis = new window.Lenis({
+      autoRaf: false,
+      duration: 1.15,
+      smoothWheel: true,
+      syncTouch: true,
+      syncTouchLerp: .085,
+      touchMultiplier: 1,
+      wheelMultiplier: .9,
+      overscroll: true
+    });
+
+    lenis.on('scroll', schedule);
+
+    const loop = (time) => {
+      if (!lenis || committed) return;
+      lenis.raf(time);
+      lenisRaf = requestAnimationFrame(loop);
+    };
+
+    lenisRaf = requestAnimationFrame(loop);
+  }
+
+  initLenis();
   render();
+
   addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', schedule, { passive: true });
   addEventListener('pageshow', schedule);
+  addEventListener('pagehide', stopLenis);
 })();
