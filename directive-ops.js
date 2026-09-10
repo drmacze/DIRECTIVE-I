@@ -89,24 +89,49 @@
   function editEntry(entry){
     currentEntry=entry;uploadedPath=entry?.metadata?.storage_path||'';document.querySelector('[data-editor-title]').textContent='Edit showcase entry';document.querySelector('[data-delete-entry]').hidden=false;document.querySelector('[data-entry-id]').value=entry.id||'';document.querySelector('[data-entry-kind]').value=entry.kind||'image';document.querySelector('[data-entry-sort]').value=entry.sort_order??100;document.querySelector('[data-entry-title]').value=entry.title||'';document.querySelector('[data-entry-subtitle]').value=entry.subtitle||'';document.querySelector('[data-entry-description]').value=entry.description||'';document.querySelector('[data-entry-url]').value=entry.asset_url||'';document.querySelector('[data-entry-thumb]').value=entry.thumbnail_url||'';document.querySelector('[data-entry-published]').checked=entry.is_published!==false;document.querySelector('[data-editor-error]').textContent='';
   }
+  function collectEntry(){
+    return {kind:document.querySelector('[data-entry-kind]').value,sort_order:Number(document.querySelector('[data-entry-sort]').value||100),title:document.querySelector('[data-entry-title]').value,subtitle:document.querySelector('[data-entry-subtitle]').value,description:document.querySelector('[data-entry-description]').value,asset_url:document.querySelector('[data-entry-url]').value,thumbnail_url:document.querySelector('[data-entry-thumb]').value,is_published:document.querySelector('[data-entry-published]').checked,metadata:{...(currentEntry?.metadata||{}),...(uploadedPath?{storage_path:uploadedPath}:{})}};
+  }
+  async function persistEntry(){
+    const id=document.querySelector('[data-entry-id]').value||null;
+    const data=await request('save_showcase',{id,entry:collectEntry()});
+    if(data?.entry){
+      currentEntry=data.entry;
+      document.querySelector('[data-entry-id]').value=data.entry.id||'';
+      document.querySelector('[data-editor-title]').textContent='Edit showcase entry';
+      document.querySelector('[data-delete-entry]').hidden=false;
+    }
+    await loadShowcase();await loadDashboard();
+    return data?.entry||null;
+  }
   async function saveEntry(event){
     event.preventDefault();const errorEl=document.querySelector('[data-editor-error]');errorEl.textContent='';
-    const id=document.querySelector('[data-entry-id]').value||null;
-    const entry={kind:document.querySelector('[data-entry-kind]').value,sort_order:Number(document.querySelector('[data-entry-sort]').value||100),title:document.querySelector('[data-entry-title]').value,subtitle:document.querySelector('[data-entry-subtitle]').value,description:document.querySelector('[data-entry-description]').value,asset_url:document.querySelector('[data-entry-url]').value,thumbnail_url:document.querySelector('[data-entry-thumb]').value,is_published:document.querySelector('[data-entry-published]').checked,metadata:{...(currentEntry?.metadata||{}),...(uploadedPath?{storage_path:uploadedPath}:{})}};
-    try{await request('save_showcase',{id,entry});resetEditor();await loadShowcase();await loadDashboard()}catch(error){errorEl.textContent=error.message}
+    try{await persistEntry();resetEditor()}catch(error){errorEl.textContent=error.message}
   }
   async function deleteEntry(){
     const id=document.querySelector('[data-entry-id]').value;if(!id||!confirm('Delete this Showcase entry?'))return;
     try{await request('delete_showcase',{id});resetEditor();await loadShowcase();await loadDashboard()}catch(error){document.querySelector('[data-editor-error]').textContent=error.message}
+  }
+  function friendlyTitle(filename){
+    return filename.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim().replace(/\b\w/g,c=>c.toUpperCase()).slice(0,120)||'Showcase Asset';
   }
   async function uploadAsset(){
     const input=document.querySelector('[data-upload-file]');const status=document.querySelector('[data-upload-status]');const file=input.files?.[0];if(!file)return status.textContent='Choose a file first.';if(file.size>50*1024*1024)return status.textContent='Maximum file size is 50 MB.';if(!supabaseClient)return status.textContent='Storage client unavailable.';
     status.textContent='Preparing upload…';
     try{
       let contentType=file.type||'';if(!contentType&&/\.glb$/i.test(file.name))contentType='model/gltf-binary';if(!contentType&&/\.gltf$/i.test(file.name))contentType='model/gltf+json';if(!contentType)contentType='application/octet-stream';
+      const isModel=/\.glb$|\.gltf$/i.test(file.name)||/^model\//.test(contentType);
+      const isImage=/^image\//.test(contentType);
+      if(isModel)document.querySelector('[data-entry-kind]').value='model';
+      else if(isImage)document.querySelector('[data-entry-kind]').value='image';
+      const titleInput=document.querySelector('[data-entry-title]');if(!titleInput.value.trim())titleInput.value=friendlyTitle(file.name);
       const signed=await request('create_upload',{filename:file.name,content_type:contentType});status.textContent='Uploading…';
       const {error}=await supabaseClient.storage.from(BUCKET).uploadToSignedUrl(signed.path,signed.token,file,{contentType});if(error)throw error;
-      uploadedPath=signed.path;document.querySelector('[data-entry-url]').value=signed.public_url;if(/^image\//.test(contentType))document.querySelector('[data-entry-thumb]').value=signed.public_url;status.textContent='Upload complete.';
+      uploadedPath=signed.path;document.querySelector('[data-entry-url]').value=signed.public_url;if(isImage)document.querySelector('[data-entry-thumb]').value=signed.public_url;
+      status.textContent='Upload complete. Saving Showcase entry…';
+      const saved=await persistEntry();
+      status.textContent=saved?.is_published===false?'Uploaded and saved as draft.':'Uploaded and published.';
+      input.value='';
     }catch(error){status.textContent=error.message||'Upload failed.'}
   }
 
